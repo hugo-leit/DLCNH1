@@ -12,6 +12,10 @@
 <meta name="apple-mobile-web-app-title" content="Caderno">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="120x120" href="apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="152x152" href="apple-touch-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="167x167" href="apple-touch-icon-167x167.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <style>
   :root{
     color-scheme: light only;
@@ -32,6 +36,63 @@
     --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
 
     --ease: cubic-bezier(.32,.72,.28,1);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; }
+    #splash, #splash *{ animation:none !important; }
+    #splash{ opacity:0 !important; }
+  }
+
+  /* ---------- animação de abertura ---------- */
+  #splash{
+    position:fixed; inset:0; z-index:9999;
+    background:#1E3A2D;
+    display:flex; align-items:center; justify-content:center;
+    pointer-events:none;
+    animation: splashOut .5s var(--ease) 2.45s forwards;
+  }
+  #splash svg{ width:38vw; max-width:220px; height:auto; overflow:visible; }
+  @keyframes splashOut{ to{ opacity:0; } }
+
+  #splash .d-outline{
+    fill:none; stroke:#F4F6F2; stroke-width:7;
+    stroke-dasharray:1; stroke-dashoffset:1;
+    animation: drawD .85s var(--ease) .1s forwards;
+  }
+  @keyframes drawD{ to{ stroke-dashoffset:0; } }
+
+  #splash .d-fill{
+    fill:#F4F6F2; opacity:0;
+    animation: fillD .5s var(--ease) .75s forwards;
+  }
+  @keyframes fillD{ to{ opacity:1; } }
+
+  /* estado de repouso: vazio (antes de qualquer animação rodar) */
+  #splash .dot{
+    fill:none; stroke:#F4F6F2; stroke-opacity:.45; stroke-width:5;
+    transform-box:fill-box; transform-origin:center;
+  }
+
+  /* fase 1: os quatro se preenchem, um a um */
+  @keyframes dotFill{
+    0%   { fill:none; stroke-opacity:.45; transform:scale(1); }
+    58%  { transform:scale(1.16); }
+    72%  { stroke:none; fill:#F4F6F2; }
+    100% { transform:scale(1); stroke:none; fill:#F4F6F2; }
+  }
+  #splash #dot-1{ animation: dotFill .38s var(--ease) 1.00s forwards; }
+  #splash #dot-2{ animation: dotFill .38s var(--ease) 1.11s forwards; }
+  #splash #dot-3{ animation: dotFill .38s var(--ease) 1.22s forwards; }
+  #splash #dot-4{ animation: dotFill .38s var(--ease) 1.33s forwards,
+                             dotEaten .42s var(--ease) 1.90s forwards; }
+
+  /* fase 2: só o último esvazia — vira o anel verde, "comido" */
+  @keyframes dotEaten{
+    0%   { fill:#F4F6F2; stroke:none; transform:scale(1); }
+    38%  { transform:scale(.8); }
+    58%  { fill:none; stroke:#9FC3AC; stroke-opacity:1; }
+    100% { transform:scale(1); fill:none; stroke:#9FC3AC; stroke-opacity:1; }
   }
 
   *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -376,6 +437,20 @@
 </style>
 </head>
 <body>
+
+<div id="splash" aria-hidden="true">
+  <svg viewBox="0 0 714 748" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(-16.399658203125,728) scale(1,-1)">
+      <path class="d-outline" pathLength="1" d="M333.401123046875 708Q524.8018798828125 708 617.6022338867188 618.5Q710.402587890625 529 710.402587890625 362Q710.402587890625 253 664.9024047851562 171.5Q619.4022216796875 90 533.0018920898438 45.0Q446.6015625 0 324.401123046875 0Q309.0010986328125 0 283.40106201171875 1.0Q257.801025390625 2 230.30096435546875 2.5Q202.8009033203125 3 180.40087890625 3Q139.4005126953125 3 100.00018310546875 2.5Q60.599853515625 2 36.399658203125 0V20Q69.1995849609375 22 85.69952392578125 28.0Q102.199462890625 34 107.7994384765625 52.0Q113.3994140625 70 113.3994140625 106V602Q113.3994140625 639 107.7994384765625 656.5Q102.199462890625 674 85.49951171875 680.5Q68.799560546875 687 36.399658203125 688V708Q60.599853515625 707 100.00018310546875 705.5Q139.4005126953125 704 178.40087890625 705Q214.200927734375 706 259.20098876953125 707.0Q304.2010498046875 708 333.401123046875 708ZM324.402099609375 690Q278.402099609375 690 264.402099609375 673.0Q250.402099609375 656 250.402099609375 604V104Q250.402099609375 52 264.902099609375 35.0Q279.402099609375 18 325.402099609375 18Q418.0010986328125 18 470.400634765625 57.5Q522.8001708984375 97 544.6000366210938 173.0Q566.39990234375 249 566.39990234375 358Q566.39990234375 470 542.7000732421875 543.5Q519.000244140625 617 466.1007080078125 653.5Q413.201171875 690 324.402099609375 690Z"/>
+      <path class="d-fill" d="M333.401123046875 708Q524.8018798828125 708 617.6022338867188 618.5Q710.402587890625 529 710.402587890625 362Q710.402587890625 253 664.9024047851562 171.5Q619.4022216796875 90 533.0018920898438 45.0Q446.6015625 0 324.401123046875 0Q309.0010986328125 0 283.40106201171875 1.0Q257.801025390625 2 230.30096435546875 2.5Q202.8009033203125 3 180.40087890625 3Q139.4005126953125 3 100.00018310546875 2.5Q60.599853515625 2 36.399658203125 0V20Q69.1995849609375 22 85.69952392578125 28.0Q102.199462890625 34 107.7994384765625 52.0Q113.3994140625 70 113.3994140625 106V602Q113.3994140625 639 107.7994384765625 656.5Q102.199462890625 674 85.49951171875 680.5Q68.799560546875 687 36.399658203125 688V708Q60.599853515625 707 100.00018310546875 705.5Q139.4005126953125 704 178.40087890625 705Q214.200927734375 706 259.20098876953125 707.0Q304.2010498046875 708 333.401123046875 708ZM324.402099609375 690Q278.402099609375 690 264.402099609375 673.0Q250.402099609375 656 250.402099609375 604V104Q250.402099609375 52 264.902099609375 35.0Q279.402099609375 18 325.402099609375 18Q418.0010986328125 18 470.400634765625 57.5Q522.8001708984375 97 544.6000366210938 173.0Q566.39990234375 249 566.39990234375 358Q566.39990234375 470 542.7000732421875 543.5Q519.000244140625 617 466.1007080078125 653.5Q413.201171875 690 324.402099609375 690Z"/>
+      <rect class="dot" id="dot-1" x="230" y="261" width="46" height="46" rx="14"/>
+      <rect class="dot" id="dot-2" x="230" y="321" width="46" height="46" rx="14"/>
+      <rect class="dot" id="dot-3" x="230" y="381" width="46" height="46" rx="14"/>
+      <rect class="dot" id="dot-4" x="230" y="441" width="46" height="46" rx="14"/>
+    </g>
+  </svg>
+</div>
+
 <div id="app">
 
 <header class="top">
