@@ -291,6 +291,11 @@
     transition:background var(--t), color var(--t), border-color var(--t);
   }
   .chips button:active{ background:var(--sage-200); color:var(--ivy-900); }
+  .chips button.on{
+    background:var(--ivy-900);
+    border-color:var(--ivy-900);
+    color:var(--ivory-50);
+  }
   .chips .none{
     font-family:var(--serif); font-style:italic;
     font-size:15px; color:var(--sage-600); padding:9px 0;
@@ -476,6 +481,17 @@
     margin-top:var(--s-1);
     line-height:1.4;
   }
+  .record .when .rtags{
+    display:flex; flex-wrap:wrap; gap:6px;
+    margin-top:var(--s-2);
+  }
+  .record .when .rtags span{
+    font-size:12.5px;
+    color:var(--ivy-800);
+    background:var(--sage-200);
+    border-radius:999px;
+    padding:4px 10px;
+  }
   .record .actions{
     display:flex; align-items:center; gap:var(--s-1);
     margin-top:var(--s-2); margin-left:-10px;
@@ -524,6 +540,19 @@
     line-height:1.5; margin:0 0 var(--s-5);
   }
   .hint.tight{ margin-bottom:var(--s-4); }
+
+  .preview{
+    background:var(--sage-200);
+    color:var(--ivy-800);
+    border-radius:var(--radius-sm);
+    padding:var(--s-3) var(--s-4);
+    margin-top:var(--s-4);
+    font-size:15px;
+    line-height:1.5;
+    font-variant-numeric:tabular-nums;
+  }
+  .preview:empty{ display:none; }
+  .preview .warn{ color:var(--danger); }
 
   /* ---------- lista de ajustes ---------- */
   .list{
@@ -677,10 +706,14 @@
         <input type="time" id="f-time">
       </label>
 
+      <div class="field">
+        <span class="label-text">Tags</span>
+        <div class="chips" id="ctx-chips"></div>
+      </div>
+
       <label class="field">
         <span class="label-text">Contexto</span>
-        <input type="text" id="f-ctx" placeholder="Como estava o contexto?">
-        <div class="chips" id="ctx-chips"></div>
+        <input type="text" id="f-ctx" placeholder="Algum detalhe ou observação">
       </label>
 
       <button class="primary" id="btn-save">Salvar registro</button>
@@ -745,7 +778,7 @@
 
     <h2 class="section-title">Recontagem</h2>
     <div class="panel">
-      <p class="hint">Atualize o estoque real quando chegar um novo pedido ou houver diferença na contagem.</p>
+      <p class="hint">Substitui o total pelo que você contou de verdade. Use quando conferir o estoque na mão ou corrigir uma divergência.</p>
       <div class="row2">
         <label class="field">
           <span class="label-text">D8 real</span>
@@ -763,20 +796,25 @@
       <button class="primary" id="btn-recount">Registrar contagem</button>
     </div>
 
-    <h2 class="section-title">Ajuste rápido</h2>
+    <h2 class="section-title">Entrada de estoque</h2>
     <div class="panel">
-      <p class="hint">Corrige o estoque com a data de hoje, sem informar uma contagem completa.</p>
+      <p class="hint">Some uma carga nova ao que você já tem. A quantidade informada é adicionada ao total — não substitui.</p>
       <div class="row2">
         <label class="field">
-          <span class="label-text">D8</span>
-          <input type="number" id="cfg-d8" inputmode="decimal" step="0.5" min="0">
+          <span class="label-text">D8 a somar</span>
+          <input type="number" id="cfg-d8" inputmode="decimal" step="0.5" min="0" placeholder="0">
         </label>
         <label class="field">
-          <span class="label-text">D9</span>
-          <input type="number" id="cfg-d9" inputmode="decimal" step="0.5" min="0">
+          <span class="label-text">D9 a somar</span>
+          <input type="number" id="cfg-d9" inputmode="decimal" step="0.5" min="0" placeholder="0">
         </label>
       </div>
-      <button class="primary subdued" id="btn-cfg-save">Ajustar estoque</button>
+      <label class="field">
+        <span class="label-text">Data da entrada</span>
+        <input type="date" id="cfg-date">
+      </label>
+      <div class="preview" id="cfg-preview"></div>
+      <button class="primary subdued" id="btn-cfg-save">Somar ao estoque</button>
     </div>
   </section>
 
@@ -799,7 +837,7 @@
 
     <h2 class="section-title">Tags de contexto</h2>
     <div class="panel">
-      <p class="hint">Atalhos que aparecem abaixo do campo Contexto. Tocar em uma tag preenche o campo, que continua livre para escrever qualquer coisa.</p>
+      <p class="hint">Aparecem como opções na tela de Registro. Você pode marcar quantas quiser em cada registro; o campo Contexto fica livre para um detalhe a mais.</p>
       <div class="tag-add">
         <input type="text" id="tag-input" placeholder="Nova tag" maxlength="24" autocapitalize="words" autocomplete="off">
         <button type="button" id="btn-tag-add">Adicionar</button>
@@ -966,8 +1004,10 @@
   fDate.value = todayISO();
   fTime.value = nowHM();
 
-  /* atalhos de contexto: escrevem no mesmo campo de texto, sem nova estrutura de dados */
+  /* Tags: seleção múltipla, guardadas no registro à parte do texto livre. */
   var chipsWrap = document.getElementById("ctx-chips");
+  var selectedTags = [];
+
   function renderChips(){
     var tags = loadTags();
     chipsWrap.innerHTML = "";
@@ -982,13 +1022,21 @@
       var b = document.createElement("button");
       b.type = "button";
       b.textContent = t;
-      b.addEventListener("click", function(){ fCtx.value = t; });
+      if(selectedTags.indexOf(t) > -1) b.className = "on";
+      b.setAttribute("aria-pressed", selectedTags.indexOf(t) > -1 ? "true" : "false");
+      b.addEventListener("click", function(){
+        var i = selectedTags.indexOf(t);
+        if(i > -1) selectedTags.splice(i,1);
+        else selectedTags.push(t);
+        renderChips();
+      });
       chipsWrap.appendChild(b);
     });
   }
 
   function clearAmounts(keepDate){
     fD8.value = 0; fD9.value = 0; fTime.value = nowHM(); fCtx.value = "";
+    selectedTags = []; renderChips();
     if(!keepDate) fDate.value = todayISO();
   }
   function exitEditMode(){
@@ -1007,14 +1055,14 @@
     if(editingId){
       var idx = list.findIndex(function(r){ return r.id === editingId; });
       if(idx > -1){
-        list[idx] = { id:editingId, date:fDate.value, d8:d8, d9:d9, time:fTime.value, ctx:fCtx.value.trim() };
+        list[idx] = { id:editingId, date:fDate.value, d8:d8, d9:d9, time:fTime.value, ctx:fCtx.value.trim(), tags:selectedTags.slice() };
       }
       exitEditMode();
       saveRecords(list);
       clearAmounts(true);
       toast("Registro atualizado");
     } else {
-      list.push({ id:uid(), date:fDate.value, d8:d8, d9:d9, time:fTime.value, ctx:fCtx.value.trim() });
+      list.push({ id:uid(), date:fDate.value, d8:d8, d9:d9, time:fTime.value, ctx:fCtx.value.trim(), tags:selectedTags.slice() });
       saveRecords(list);
       clearAmounts(true);
       toast("Registrado");
@@ -1053,7 +1101,12 @@
       when.className = "when";
       when.innerHTML =
         '<span class="date">' + fmtShort(r.date) + (r.time ? " · " + r.time : "") + '</span>' +
-        (r.ctx ? '<span class="ctx">' + escapeHTML(r.ctx) + '</span>' : "");
+        (r.ctx ? '<span class="ctx">' + escapeHTML(r.ctx) + '</span>' : "") +
+        (Array.isArray(r.tags) && r.tags.length
+          ? '<div class="rtags">' + r.tags.map(function(t){
+              return '<span>' + escapeHTML(t) + '</span>';
+            }).join("") + '</div>'
+          : "");
 
       var actions = document.createElement("div");
       actions.className = "actions";
@@ -1101,6 +1154,8 @@
     fD9.value = r.d9;
     fTime.value = r.time || nowHM();
     fCtx.value = r.ctx || "";
+    selectedTags = Array.isArray(r.tags) ? r.tags.slice() : [];
+    renderChips();
     btnCancelEdit.style.display = "block";
     btnSave.textContent = "Salvar edição";
     goTo("registro");
@@ -1229,23 +1284,89 @@
     toast("Contagem registrada");
   });
 
-  // ---------- ajuste rápido de estoque (mesma lógica, agora na aba Estoque) ----------
-  function renderConfig(){
-    var stock = computeStock();
-    var evt = latestStockEvent();
-    document.getElementById("cfg-d8").value = stock ? stock.d8 : (evt ? evt.d8 : "");
-    document.getElementById("cfg-d9").value = stock ? stock.d9 : (evt ? evt.d9 : "");
+  // ---------- entrada de estoque (soma ao total) ----------
+  var cfgD8 = document.getElementById("cfg-d8");
+  var cfgD9 = document.getElementById("cfg-d9");
+  var cfgDate = document.getElementById("cfg-date");
+  var cfgPreview = document.getElementById("cfg-preview");
+
+  /* Quanto havia em estoque imediatamente ANTES da data informada.
+     Os eventos continuam sendo marcos absolutos; a soma vira um marco novo
+     calculado a partir do saldo daquele momento, sem descontar nada duas vezes. */
+  function stockBefore(dateISO){
+    var events = loadStockEvents().filter(function(e){ return e.date <= dateISO; })
+                                  .sort(function(a,b){ return a.date < b.date ? 1 : -1; });
+    if(events.length === 0) return { d8:0, d9:0, hasBase:false };
+    var base = events[0];
+    var usedD8 = 0, usedD9 = 0;
+    loadRecords().forEach(function(r){
+      if(r.date >= base.date && r.date < dateISO){ usedD8 += r.d8 || 0; usedD9 += r.d9 || 0; }
+    });
+    return {
+      d8: Math.max(0, Math.round((base.d8 - usedD8)*100)/100),
+      d9: Math.max(0, Math.round((base.d9 - usedD9)*100)/100),
+      hasBase: true
+    };
   }
 
+  function renderConfig(){
+    if(!cfgDate.value) cfgDate.value = todayISO();
+    updatePreview();
+  }
+
+  function updatePreview(){
+    var add8 = parseFloat(cfgD8.value) || 0;
+    var add9 = parseFloat(cfgD9.value) || 0;
+    var date = cfgDate.value || todayISO();
+
+    if(add8 === 0 && add9 === 0){ cfgPreview.innerHTML = ""; return; }
+
+    var latest = latestStockEvent();
+    if(latest && date < latest.date){
+      cfgPreview.innerHTML = '<span class="warn">A data é anterior à última contagem (' +
+        fmtShort(latest.date) + '). Escolha uma data igual ou posterior.</span>';
+      return;
+    }
+
+    var before = stockBefore(date);
+    cfgPreview.innerHTML =
+      "D8 &nbsp;" + fmtNum(before.d8) + " + " + fmtNum(add8) + " = <strong>" + fmtNum(before.d8 + add8) + "</strong><br>" +
+      "D9 &nbsp;" + fmtNum(before.d9) + " + " + fmtNum(add9) + " = <strong>" + fmtNum(before.d9 + add9) + "</strong>";
+  }
+
+  [cfgD8, cfgD9, cfgDate].forEach(function(el){
+    el.addEventListener("input", updatePreview);
+    el.addEventListener("change", updatePreview);
+  });
+
   document.getElementById("btn-cfg-save").addEventListener("click", function(){
-    var d8 = parseFloat(document.getElementById("cfg-d8").value);
-    var d9 = parseFloat(document.getElementById("cfg-d9").value);
-    if(isNaN(d8) || isNaN(d9)){ toast("Preencha D8 e D9"); return; }
+    var add8 = parseFloat(cfgD8.value) || 0;
+    var add9 = parseFloat(cfgD9.value) || 0;
+    var date = cfgDate.value;
+    if(!date){ toast("Escolha a data da entrada"); return; }
+    if(add8 === 0 && add9 === 0){ toast("Informe a quantidade que chegou"); return; }
+
+    var latest = latestStockEvent();
+    if(latest && date < latest.date){
+      toast("A data é anterior à última contagem");
+      return;
+    }
+
+    var before = stockBefore(date);
     var events = loadStockEvents();
-    events.push({ date:todayISO(), d8:d8, d9:d9 });
+    events.push({
+      date: date,
+      d8: Math.round((before.d8 + add8)*100)/100,
+      d9: Math.round((before.d9 + add9)*100)/100
+    });
     saveStockEvents(events);
+
+    cfgD8.value = ""; cfgD9.value = "";
+    cfgDate.value = todayISO();
+    cfgPreview.innerHTML = "";
     renderStock();
-    toast("Estoque ajustado");
+    mainEl.scrollTo({ top:0, behavior:"smooth" });
+    toast("Entrada somada ao estoque");
   });
 
   // ---------- gerenciador de tags (Ajustes) ----------
@@ -1294,6 +1415,7 @@
 
   function removeTag(name){
     saveTags(loadTags().filter(function(t){ return t !== name; }));
+    selectedTags = selectedTags.filter(function(t){ return t !== name; });
     renderTagList();
     renderChips();
     toast("Tag removida");
@@ -1313,13 +1435,14 @@
 
   // ---------- exportação ----------
   function toCSV(){
-    var rows = [["Data","Horário","D8","D9","Contexto"]];
+    var rows = [["Data","Horário","D8","D9","Tags","Contexto"]];
     loadRecords().slice().sort(function(a,b){ return a.date < b.date ? -1 : 1; }).forEach(function(r){
       rows.push([
         fmtBR(r.date),
         r.time || "",
         r.d8 ? String(r.d8).replace(".", ",") : "0",
         r.d9 ? String(r.d9).replace(".", ",") : "0",
+        (Array.isArray(r.tags) ? r.tags.join(", ") : "").replace(/;/g, ","),
         (r.ctx || "").replace(/;/g, ",")
       ]);
     });
