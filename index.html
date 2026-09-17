@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Caderno</title>
+<title>DLCNH</title>
 <meta name="color-scheme" content="light only">
 <meta name="supported-color-schemes" content="light">
-<meta name="theme-color" content="#F4F6F2">
+<meta name="theme-color" content="#F3F5F0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Caderno">
+<meta name="apple-mobile-web-app-title" content="DLCNH">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="120x120" href="apple-touch-icon-120x120.png">
@@ -20,22 +20,40 @@
   :root{
     color-scheme: light only;
 
-    --bg:#F4F6F2;          /* branco mineral, levemente verde */
-    --surface:#FFFFFF;      /* camada por contraste de luz, não por sombra */
-    --ink:#1E3A2D;          /* verde-hera profundo no lugar de preto */
-    --ink-mid:#4A6355;
-    --ink-soft:#7C9484;     /* eucalipto dessaturado */
-    --line:#DCE1D6;
-    --line-fine:#E8ECE4;
-    --wash:#EDF1E9;         /* realce discreto */
-    --accent:#3E6B52;       /* verde vivo, usado com parcimônia */
-    --warn:#A2624E;         /* terracota apagado, só para alerta */
-    --warn-wash:#F5EBE5;
+    /* verde-hera */
+    --ivy-950:#18382C;
+    --ivy-900:#1E3A2D;
+    --ivy-800:#284A3A;
+    /* sálvia */
+    --sage-700:#5E7768;
+    --sage-600:#728B7C;
+    --sage-500:#8FA496;
+    --sage-300:#CBD5CC;
+    --sage-200:#DCE3DC;
+    /* marfim */
+    --ivory-50:#F7F8F4;
+    --ivory-100:#F3F5F0;
+    --surface:#FFFEFB;
+    --field:#EFF2ED;
+    /* terracota discreto, só para risco */
+    --danger:#AA624D;
+    --danger-soft:#EAD5CD;
+
+    --radius-sm:12px;
+    --radius-md:16px;
+    --radius-lg:20px;
+    --radius-xl:24px;
+
+    /* escala de espaçamento */
+    --s-1:4px;  --s-2:8px;  --s-3:12px; --s-4:16px;
+    --s-5:20px; --s-6:24px; --s-8:32px; --s-9:40px;
+    --gutter:23px;
 
     --serif: ui-serif, "New York", "Iowan Old Style", Georgia, serif;
     --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
 
     --ease: cubic-bezier(.32,.72,.28,1);
+    --t: 180ms var(--ease);
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -99,8 +117,8 @@
 
   html,body{
     margin:0; padding:0;
-    background:var(--bg);
-    color:var(--ink);
+    background:var(--ivory-100);
+    color:var(--ivy-950);
     font-family:var(--sans);
     font-size:16px;
     -webkit-font-smoothing:antialiased;
@@ -117,28 +135,34 @@
     flex-direction:column;
   }
 
-  ::selection{ background:var(--wash); }
+  ::selection{ background:var(--sage-200); }
 
   /* ---------- cabeçalho ---------- */
   header.top{
     flex:0 0 auto;
-    padding:calc(18px + env(safe-area-inset-top)) 24px 18px;
-    background:var(--bg);
+    padding:calc(var(--s-3) + env(safe-area-inset-top)) var(--gutter) var(--s-3);
+    background:var(--ivory-100);
+  }
+  header.top .brand{
+    font-size:12px;
+    font-weight:500;
+    letter-spacing:0.14em;
+    color:var(--sage-600);
   }
   header.top .date{
     font-family:var(--serif);
     font-style:italic;
-    font-size:14.5px;
-    color:var(--ink-soft);
-    letter-spacing:0.01em;
+    font-size:15px;
+    color:var(--sage-700);
+    margin-top:var(--s-1);
   }
   header.top h1{
     font-family:var(--serif);
     font-weight:400;
-    font-size:30px;
-    line-height:1.1;
-    margin:6px 0 0;
-    letter-spacing:-0.012em;
+    font-size:37px;
+    line-height:1.04;
+    margin:var(--s-2) 0 0;
+    letter-spacing:-0.016em;
   }
 
   /* ---------- área rolável ---------- */
@@ -148,252 +172,399 @@
     overflow-y:auto;
     -webkit-overflow-scrolling:touch;
     overscroll-behavior-y:contain;
-    padding:4px 24px 32px;
+    padding:var(--s-1) var(--gutter) var(--s-9);
   }
   section.view{ display:none; }
-  section.view.active{ display:block; }
+  section.view.active{ display:block; animation:viewIn .18s var(--ease); }
+  @keyframes viewIn{ from{ opacity:0; } to{ opacity:1; } }
 
+  /* Rótulo de seção: hierarquia por tipografia e espaço, não por caixa */
   h2.section-title{
     font-family:var(--serif);
     font-weight:400;
-    font-size:15px;
-    color:var(--ink-mid);
-    letter-spacing:0.015em;
-    margin:30px 0 12px;
-    padding-bottom:10px;
-    border-bottom:1px solid var(--line);
+    font-size:21px;
+    color:var(--ivy-900);
+    letter-spacing:-0.008em;
+    margin:var(--s-8) 0 var(--s-4);
   }
-  h2.section-title:first-child{ margin-top:14px; }
+  h2.section-title:first-child{ margin-top:var(--s-4); }
 
   .panel{
     background:var(--surface);
-    border-radius:18px;
-    padding:20px;
-    margin-bottom:6px;
+    border-radius:var(--radius-lg);
+    padding:var(--s-5);
   }
+  .panel + .panel{ margin-top:var(--s-3); }
 
   /* ---------- formulário ---------- */
-  .field{ display:block; margin-bottom:18px; }
+  .field{ display:block; margin-bottom:var(--s-5); }
   .field:last-of-type{ margin-bottom:0; }
   .field .label-text{
     display:block;
-    font-size:13px;
-    color:var(--ink-soft);
-    margin-bottom:8px;
-    letter-spacing:0.012em;
+    font-size:14px;
+    color:var(--sage-700);
+    margin-bottom:var(--s-2);
   }
 
   input[type=date], input[type=time], input[type=number], input[type=text]{
     width:100%;
     font-family:var(--sans);
-    font-size:16.5px;
-    color:var(--ink);
-    background:var(--bg);
+    font-size:17px;              /* >=16px evita o zoom automático do iPhone */
+    color:var(--ivy-950);
+    background:var(--field);
     border:1px solid transparent;
-    border-radius:12px;
-    padding:13px 14px;
+    border-radius:var(--radius-sm);
+    padding:14px;
+    min-height:48px;
     appearance:none; -webkit-appearance:none;
-    transition:border-color .18s var(--ease), background .18s var(--ease);
+    transition:background var(--t), box-shadow var(--t), border-color var(--t);
   }
-  input::placeholder{ color:var(--ink-soft); opacity:.75; }
-  input:focus{
+  input::placeholder{ color:var(--sage-600); }
+  input:focus{ outline:none; }
+  input:focus-visible{
     outline:none;
     background:var(--surface);
-    border-color:var(--accent);
+    border-color:var(--sage-500);
+    box-shadow:0 0 0 3px rgba(120,145,129,.24);
   }
 
-  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s-4); }
+  @media (max-width:340px){ .row2{ grid-template-columns:1fr; } }
 
-  /* Contador de doses: círculos finos, toque generoso, número em serifada */
-  .stepper{ display:flex; align-items:center; gap:8px; }
+  /* Contador de doses: o número é o protagonista, +/− ficam discretos */
+  .dose{
+    background:var(--field);
+    border-radius:var(--radius-md);
+    padding:var(--s-3) var(--s-2) var(--s-2);
+    text-align:center;
+  }
+  .dose .dose-name{
+    font-size:13px;
+    letter-spacing:0.08em;
+    color:var(--sage-700);
+  }
+  .stepper{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-top:var(--s-1);
+  }
   .stepper button{
-    width:42px; height:42px; flex:0 0 42px;
+    width:44px; height:44px; flex:0 0 44px;
     border-radius:50%;
-    border:1px solid var(--line);
-    background:var(--surface);
-    color:var(--ink-mid);
-    font-size:19px; line-height:1;
+    border:none;
+    background:transparent;
+    color:var(--sage-700);
+    font-size:22px; line-height:1;
     font-family:var(--sans); font-weight:300;
-    transition:background .15s var(--ease), border-color .15s var(--ease);
+    transition:background var(--t), color var(--t), transform var(--t);
   }
-  .stepper button:active{ background:var(--wash); border-color:var(--ink-soft); }
+  .stepper button:active{ background:var(--sage-200); color:var(--ivy-900); transform:scale(.94); }
+  .stepper button:focus-visible{
+    outline:none; box-shadow:0 0 0 3px rgba(120,145,129,.3);
+  }
   .stepper input{
+    flex:1 1 auto;
+    width:100%;
+    min-width:0;
     text-align:center;
     font-family:var(--serif);
-    font-size:21px;
+    font-size:37px;
     font-variant-numeric:tabular-nums;
-    padding:11px 4px;
+    background:transparent;
+    border:none;
+    padding:0;
+    min-height:0;
+    color:var(--ivy-950);
   }
+  .stepper input:focus-visible{ background:transparent; box-shadow:none; border-color:transparent; }
+
+  /* atalhos de contexto — apenas preenchem o campo de texto existente */
+  .chips{ display:flex; flex-wrap:wrap; gap:var(--s-2); margin-top:var(--s-3); }
+  .chips button{
+    border:1px solid var(--sage-200);
+    background:transparent;
+    color:var(--sage-700);
+    font-family:var(--sans);
+    font-size:14px;
+    padding:9px 14px;
+    min-height:38px;
+    border-radius:999px;
+    transition:background var(--t), color var(--t), border-color var(--t);
+  }
+  .chips button:active{ background:var(--sage-200); color:var(--ivy-900); }
+  .chips .none{
+    font-family:var(--serif); font-style:italic;
+    font-size:15px; color:var(--sage-600); padding:9px 0;
+  }
+
+  /* gerenciador de tags (Ajustes) */
+  .tag-add{ display:flex; gap:var(--s-2); }
+  .tag-add input{ flex:1 1 auto; min-width:0; }
+  .tag-add button{
+    flex:0 0 auto;
+    min-height:48px; padding:0 20px;
+    border:none; border-radius:var(--radius-sm);
+    background:var(--ivy-900); color:var(--ivory-50);
+    font-family:var(--sans); font-size:16px; font-weight:500;
+    transition:background var(--t), transform var(--t);
+  }
+  .tag-add button:active{ background:var(--ivy-950); transform:scale(.97); }
+  .tag-list{ display:flex; flex-wrap:wrap; gap:var(--s-2); margin-top:var(--s-4); }
+  .tag-list .tag-item{
+    display:flex; align-items:center; gap:2px;
+    border:1px solid var(--sage-200);
+    border-radius:999px;
+    padding-left:14px;
+    font-size:14px; color:var(--sage-700);
+  }
+  .tag-list .tag-item button{
+    background:none; border:none;
+    color:var(--sage-600);
+    font-size:17px; line-height:1;
+    width:38px; height:38px;
+    border-radius:999px;
+    transition:color var(--t), background var(--t);
+  }
+  .tag-list .tag-item button:active{ background:var(--danger-soft); color:var(--danger); }
 
   button.primary{
     width:100%;
+    min-height:56px;
     padding:17px;
     border:none;
-    border-radius:14px;
-    background:var(--ink);
-    color:#F7FAF5;
-    font-size:16.5px;
+    border-radius:var(--radius-md);
+    background:var(--ivy-900);
+    color:var(--ivory-50);
+    font-size:17.5px;
     font-family:var(--sans);
-    font-weight:500;
-    letter-spacing:0.008em;
-    margin-top:22px;
-    transition:opacity .15s var(--ease);
+    font-weight:600;
+    letter-spacing:0.005em;
+    margin-top:var(--s-6);
+    transition:background var(--t), transform var(--t), opacity var(--t);
   }
-  button.primary:active{ opacity:.82; }
+  button.primary:active{ background:var(--ivy-950); transform:scale(.985); }
+  button.primary:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(120,145,129,.45); }
+  button.primary.subdued{ background:var(--ivy-800); }
 
   button.quiet{
     width:100%;
-    padding:15px;
-    border:1px solid var(--line);
-    border-radius:14px;
-    background:var(--surface);
-    color:var(--ink-mid);
+    min-height:50px;
+    padding:14px;
+    border:1px solid var(--sage-200);
+    border-radius:var(--radius-md);
+    background:transparent;
+    color:var(--sage-700);
     font-family:var(--sans);
     font-size:15.5px;
-    margin-top:10px;
-    transition:background .15s var(--ease);
+    margin-top:var(--s-3);
+    transition:background var(--t), transform var(--t);
   }
-  button.quiet:active{ background:var(--wash); }
-  button.quiet.danger{ color:var(--warn); border-color:#EADDD6; }
+  button.quiet:active{ background:var(--sage-200); transform:scale(.985); }
+  button.quiet.danger{ color:var(--danger); border-color:var(--danger-soft); }
+  button.quiet:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(120,145,129,.35); }
 
-  /* ---------- estoque: o momento de destaque ---------- */
+  /* ---------- estoque: os números são os protagonistas ---------- */
   .stock-pair{
     background:var(--surface);
-    border-radius:20px;
-    padding:6px 22px;
-    margin-top:14px;
+    border-radius:var(--radius-xl);
+    padding:var(--s-1) var(--s-5);
   }
   .stock-row{
-    padding:24px 0;
-    border-bottom:1px solid var(--line-fine);
+    padding:var(--s-5) 0;
+    border-bottom:1px solid var(--sage-200);
   }
   .stock-row:last-child{ border-bottom:none; }
   .stock-head{
     display:flex; align-items:baseline; justify-content:space-between;
+    gap:var(--s-3);
   }
   .stock-head .name{
-    font-family:var(--serif);
-    font-size:16px;
-    color:var(--ink-mid);
-    letter-spacing:0.01em;
+    font-size:14px;
+    letter-spacing:0.1em;
+    color:var(--sage-700);
   }
   .stock-head .num{
     font-family:var(--serif);
-    font-size:52px;
+    font-size:56px;
     line-height:1;
     font-variant-numeric:tabular-nums;
-    letter-spacing:-0.02em;
+    letter-spacing:-0.022em;
   }
-  /* linha que esvazia conforme o consumo desde a última contagem */
   .gauge{
     position:relative;
-    height:1.5px;
-    background:var(--line-fine);
-    margin-top:16px;
-    border-radius:2px;
+    height:6px;
+    background:var(--sage-200);
+    margin-top:var(--s-4);
+    border-radius:999px;
     overflow:hidden;
   }
   .gauge span{
     position:absolute; inset:0 auto 0 0;
-    background:var(--accent);
-    border-radius:2px;
+    background:var(--ivy-800);
+    border-radius:999px;
     transition:width .5s var(--ease);
   }
   .stock-foot{
-    display:flex; justify-content:space-between;
-    margin-top:9px;
-    font-size:12.5px;
-    color:var(--ink-soft);
+    display:flex; justify-content:space-between; gap:var(--s-3);
+    margin-top:var(--s-3);
+    font-size:14px;
+    color:var(--sage-700);
   }
+  .stock-foot .rate{ color:var(--sage-600); }
 
   .alert-banner{
-    background:var(--warn-wash);
-    color:var(--warn);
-    border-radius:14px;
-    padding:14px 16px;
-    font-size:14.5px;
+    background:var(--danger-soft);
+    color:#8d4e3b;
+    border-radius:var(--radius-md);
+    padding:var(--s-4) var(--s-4);
+    font-size:15px;
     line-height:1.45;
-    margin-top:14px;
+    margin-top:var(--s-4);
   }
   .note{
-    background:var(--wash);
-    color:var(--ink-mid);
-    border-radius:14px;
-    padding:14px 16px;
-    font-size:14.5px;
+    background:var(--sage-200);
+    color:var(--ivy-800);
+    border-radius:var(--radius-md);
+    padding:var(--s-4);
+    font-size:15px;
     line-height:1.45;
-    margin-top:14px;
+    margin-top:var(--s-4);
   }
 
-  .stat-line{
-    display:flex; justify-content:space-between; align-items:baseline;
-    padding:13px 0;
-    border-bottom:1px solid var(--line-fine);
-    font-size:15px;
+  /* Ritmo: apresentação editorial, não tabela */
+  .rhythm{ display:flex; gap:var(--s-5); }
+  .rhythm .cell{ flex:1 1 0; min-width:0; }
+  .rhythm .cell .k{
+    font-size:13px; letter-spacing:0.09em; color:var(--sage-700);
   }
-  .stat-line:last-child{ border-bottom:none; }
-  .stat-line .k{ color:var(--ink-soft); }
-  .stat-line .v{ font-variant-numeric:tabular-nums; }
+  .rhythm .cell .v{
+    font-family:var(--serif);
+    font-size:27px;
+    font-variant-numeric:tabular-nums;
+    margin-top:var(--s-1);
+    line-height:1.1;
+  }
+  .rhythm .cell .u{ font-size:14px; color:var(--sage-700); margin-top:2px; }
+  .rhythm-foot{
+    margin-top:var(--s-5);
+    padding-top:var(--s-4);
+    border-top:1px solid var(--sage-200);
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-size:14.5px; color:var(--sage-700);
+  }
+  .rhythm-foot .v{ color:var(--ivy-900); font-variant-numeric:tabular-nums; }
 
   /* ---------- registros ---------- */
   .record{
     display:flex; justify-content:space-between; align-items:flex-start;
-    gap:14px;
-    padding:16px 0;
-    border-bottom:1px solid var(--line-fine);
+    gap:var(--s-4);
+    padding:var(--s-4) 0;
+    border-bottom:1px solid var(--sage-200);
   }
-  .record:first-child{ padding-top:4px; }
-  .record:last-child{ border-bottom:none; padding-bottom:4px; }
+  .record:first-child{ padding-top:var(--s-1); }
+  .record:last-child{ border-bottom:none; padding-bottom:var(--s-1); }
+  .record .when{ min-width:0; }
   .record .when .date{
-    font-size:15.5px;
+    font-size:14px;
+    letter-spacing:0.05em;
+    color:var(--sage-700);
     font-variant-numeric:tabular-nums;
   }
   .record .when .ctx{
-    display:block; font-size:13.5px; color:var(--ink-soft);
-    margin-top:3px; line-height:1.4;
+    display:block;
+    font-size:16px;
+    color:var(--ivy-950);
+    margin-top:var(--s-1);
+    line-height:1.4;
   }
-  .record .actions{ display:flex; gap:14px; margin-top:9px; }
-  .record .actions span{
-    font-size:13px; color:var(--ink-soft);
-    border-bottom:1px solid var(--line);
-    padding-bottom:1px;
+  .record .actions{
+    display:flex; align-items:center; gap:var(--s-1);
+    margin-top:var(--s-2); margin-left:-10px;
   }
+  .record .actions button{
+    background:none; border:none;
+    font-family:var(--sans); font-size:14px;
+    color:var(--sage-700);
+    padding:8px 10px;
+    min-height:38px;
+    border-radius:10px;
+    transition:background var(--t);
+  }
+  .record .actions button:active{ background:var(--sage-200); }
+  .record .actions .more{ letter-spacing:.12em; }
+  .record .actions .del{ color:var(--danger); display:none; }
+  .record.open .actions .del{ display:inline-block; }
+  .record.open .actions .more{ color:var(--ivy-900); }
+
   .record .amounts{
     text-align:right;
     font-family:var(--serif);
-    font-size:18px;
+    font-size:21px;
     font-variant-numeric:tabular-nums;
     white-space:nowrap;
-    line-height:1.5;
+    line-height:1.45;
   }
   .record .amounts .tag{
     font-family:var(--sans);
-    font-size:11.5px;
-    color:var(--ink-soft);
-    margin-left:5px;
-    letter-spacing:0.02em;
+    font-size:12px;
+    letter-spacing:0.06em;
+    color:var(--sage-700);
+    margin-left:6px;
   }
 
   .empty{
     font-family:var(--serif);
     font-style:italic;
-    color:var(--ink-soft);
-    font-size:15px;
-    padding:6px 0;
+    color:var(--sage-700);
+    font-size:16px;
+    padding:var(--s-2) 0;
   }
 
   .hint{
-    font-size:14px; color:var(--ink-soft);
-    line-height:1.5; margin:0 0 18px;
+    font-size:15px; color:var(--sage-700);
+    line-height:1.5; margin:0 0 var(--s-5);
   }
+  .hint.tight{ margin-bottom:var(--s-4); }
+
+  /* ---------- lista de ajustes ---------- */
+  .list{
+    background:var(--surface);
+    border-radius:var(--radius-lg);
+    overflow:hidden;
+  }
+  .list button{
+    display:flex; align-items:center; justify-content:space-between;
+    width:100%;
+    min-height:58px;
+    padding:var(--s-4) var(--s-5);
+    background:transparent;
+    border:none;
+    border-bottom:1px solid var(--sage-200);
+    font-family:var(--sans);
+    font-size:16.5px;
+    color:var(--ivy-950);
+    text-align:left;
+    transition:background var(--t);
+  }
+  .list button:last-child{ border-bottom:none; }
+  .list button:active{ background:var(--field); }
+  .list button:focus-visible{ outline:none; box-shadow:inset 0 0 0 3px rgba(120,145,129,.35); }
+  .list button svg{ flex:0 0 auto; color:var(--sage-500); }
+
+  .meta-row{
+    display:flex; justify-content:space-between; align-items:baseline;
+    padding:var(--s-4) var(--s-5);
+    font-size:15px;
+  }
+  .meta-row .k{ color:var(--sage-700); }
 
   /* ---------- toast ---------- */
   .toast{
-    position:fixed; left:50%; bottom:calc(88px + env(safe-area-inset-bottom));
+    position:fixed; left:50%;
+    bottom:calc(92px + env(safe-area-inset-bottom));
     transform:translateX(-50%) translateY(10px);
-    background:var(--ink); color:#F7FAF5;
-    padding:12px 20px; border-radius:26px;
-    font-size:14.5px; white-space:nowrap;
+    background:var(--ivy-950); color:var(--ivory-50);
+    padding:13px 22px; border-radius:999px;
+    font-size:15px; white-space:nowrap;
     opacity:0; pointer-events:none;
     transition:opacity .28s var(--ease), transform .28s var(--ease);
     z-index:20;
@@ -404,35 +575,44 @@
   nav.tabs{
     flex:0 0 auto;
     display:flex;
-    background:var(--bg);
-    border-top:1px solid var(--line);
+    background:rgba(247,248,244,.94);
+    -webkit-backdrop-filter:saturate(180%) blur(18px);
+    backdrop-filter:saturate(180%) blur(18px);
+    border-top:1px solid var(--sage-200);
     padding-bottom:env(safe-area-inset-bottom);
   }
   nav.tabs button{
     flex:1;
+    display:flex; flex-direction:column; align-items:center; gap:4px;
     background:none; border:none;
-    padding:14px 4px 12px;
+    padding:9px 4px 8px;
+    min-height:52px;
     font-family:var(--sans);
-    font-size:12.5px;
-    color:var(--ink-soft);
-    letter-spacing:0.015em;
-    transition:color .2s var(--ease);
+    font-size:11.5px;
+    color:var(--sage-600);
+    transition:color var(--t);
+  }
+  nav.tabs button svg{
+    width:23px; height:23px;
+    stroke-width:1.6;
+    transition:stroke-width var(--t);
   }
   nav.tabs button .mark{
     display:block;
-    width:16px; height:1.5px;
+    width:16px; height:2px;
     background:transparent;
-    margin:0 auto 8px;
     border-radius:2px;
-    transition:background .2s var(--ease), width .25s var(--ease);
+    transition:background var(--t), width var(--t);
   }
-  nav.tabs button.active{ color:var(--ink); }
-  nav.tabs button.active .mark{ background:var(--accent); width:22px; }
+  nav.tabs button.active{ color:var(--ivy-900); font-weight:500; }
+  nav.tabs button.active svg{ stroke-width:2.1; }
+  nav.tabs button.active .mark{ background:var(--ivy-900); width:20px; }
 
   input[type=file]{ display:none; }
 
   @media (prefers-reduced-motion: reduce){
     *{ transition:none !important; }
+    section.view.active{ animation:none; }
   }
 </style>
 </head>
@@ -454,15 +634,15 @@
 <div id="app">
 
 <header class="top">
+  <div class="brand">DLCNH</div>
   <div class="date" id="today-label">hoje</div>
-  <h1>Caderno</h1>
+  <h1 id="screen-title">Registro</h1>
 </header>
 
 <main>
 
   <!-- REGISTRO -->
   <section class="view active" id="view-registro">
-    <h2 class="section-title">Novo registro</h2>
     <div class="panel">
       <label class="field">
         <span class="label-text">Data</span>
@@ -470,22 +650,26 @@
       </label>
 
       <div class="row2">
-        <label class="field">
-          <span class="label-text">D8</span>
-          <div class="stepper">
-            <button type="button" data-step="-0.5" data-target="f-d8" aria-label="diminuir D8">−</button>
-            <input type="number" id="f-d8" inputmode="decimal" step="0.5" min="0" value="0">
-            <button type="button" data-step="0.5" data-target="f-d8" aria-label="aumentar D8">+</button>
+        <div class="field">
+          <div class="dose">
+            <div class="dose-name" id="lbl-d8">D8</div>
+            <div class="stepper">
+              <button type="button" data-step="-0.5" data-target="f-d8" aria-label="Diminuir D8">−</button>
+              <input type="number" id="f-d8" inputmode="decimal" step="0.5" min="0" value="0" aria-labelledby="lbl-d8">
+              <button type="button" data-step="0.5" data-target="f-d8" aria-label="Aumentar D8">+</button>
+            </div>
           </div>
-        </label>
-        <label class="field">
-          <span class="label-text">D9</span>
-          <div class="stepper">
-            <button type="button" data-step="-0.5" data-target="f-d9" aria-label="diminuir D9">−</button>
-            <input type="number" id="f-d9" inputmode="decimal" step="0.5" min="0" value="0">
-            <button type="button" data-step="0.5" data-target="f-d9" aria-label="aumentar D9">+</button>
+        </div>
+        <div class="field">
+          <div class="dose">
+            <div class="dose-name" id="lbl-d9">D9</div>
+            <div class="stepper">
+              <button type="button" data-step="-0.5" data-target="f-d9" aria-label="Diminuir D9">−</button>
+              <input type="number" id="f-d9" inputmode="decimal" step="0.5" min="0" value="0" aria-labelledby="lbl-d9">
+              <button type="button" data-step="0.5" data-target="f-d9" aria-label="Aumentar D9">+</button>
+            </div>
           </div>
-        </label>
+        </div>
       </div>
 
       <label class="field">
@@ -495,7 +679,8 @@
 
       <label class="field">
         <span class="label-text">Contexto</span>
-        <input type="text" id="f-ctx" placeholder="show, recovery, sexta sem substância">
+        <input type="text" id="f-ctx" placeholder="Como estava o contexto?">
+        <div class="chips" id="ctx-chips"></div>
       </label>
 
       <button class="primary" id="btn-save">Salvar registro</button>
@@ -510,7 +695,6 @@
 
   <!-- ESTOQUE -->
   <section class="view" id="view-estoque">
-    <h2 class="section-title">Estoque</h2>
 
     <div class="stock-pair">
       <div class="stock-row">
@@ -521,7 +705,7 @@
         <div class="gauge"><span id="gauge-d8" style="width:0%"></span></div>
         <div class="stock-foot">
           <span id="foot-d8-left">—</span>
-          <span id="foot-d8-rate"></span>
+          <span class="rate" id="foot-d8-rate"></span>
         </div>
       </div>
       <div class="stock-row">
@@ -532,23 +716,36 @@
         <div class="gauge"><span id="gauge-d9" style="width:0%"></span></div>
         <div class="stock-foot">
           <span id="foot-d9-left">—</span>
-          <span id="foot-d9-rate"></span>
+          <span class="rate" id="foot-d9-rate"></span>
         </div>
       </div>
     </div>
 
     <div id="stock-alert"></div>
 
-    <h2 class="section-title">Consumo</h2>
+    <h2 class="section-title">Ritmo</h2>
     <div class="panel">
-      <div class="stat-line"><span class="k">Média semanal · D8</span><span class="v" id="avg-d8">—</span></div>
-      <div class="stat-line"><span class="k">Média semanal · D9</span><span class="v" id="avg-d9">—</span></div>
-      <div class="stat-line"><span class="k">Última contagem</span><span class="v" id="last-count">—</span></div>
+      <div class="rhythm">
+        <div class="cell">
+          <div class="k">D8</div>
+          <div class="v" id="avg-d8">—</div>
+          <div class="u">por semana</div>
+        </div>
+        <div class="cell">
+          <div class="k">D9</div>
+          <div class="v" id="avg-d9">—</div>
+          <div class="u">por semana</div>
+        </div>
+      </div>
+      <div class="rhythm-foot">
+        <span>Última contagem</span>
+        <span class="v" id="last-count">—</span>
+      </div>
     </div>
 
     <h2 class="section-title">Recontagem</h2>
     <div class="panel">
-      <p class="hint">Use quando chegar um pedido novo ou para corrigir uma divergência. A contagem informada aqui vira o novo ponto de partida.</p>
+      <p class="hint">Atualize o estoque real quando chegar um novo pedido ou houver diferença na contagem.</p>
       <div class="row2">
         <label class="field">
           <span class="label-text">D8 real</span>
@@ -565,13 +762,10 @@
       </label>
       <button class="primary" id="btn-recount">Registrar contagem</button>
     </div>
-  </section>
 
-  <!-- AJUSTES -->
-  <section class="view" id="view-config">
-    <h2 class="section-title">Ajuste de estoque</h2>
+    <h2 class="section-title">Ajuste rápido</h2>
     <div class="panel">
-      <p class="hint">Mesmo efeito de uma recontagem, com a data de hoje.</p>
+      <p class="hint">Corrige o estoque com a data de hoje, sem informar uma contagem completa.</p>
       <div class="row2">
         <label class="field">
           <span class="label-text">D8</span>
@@ -582,33 +776,61 @@
           <input type="number" id="cfg-d9" inputmode="decimal" step="0.5" min="0">
         </label>
       </div>
-      <button class="primary" id="btn-cfg-save">Salvar ajuste</button>
+      <button class="primary subdued" id="btn-cfg-save">Ajustar estoque</button>
     </div>
+  </section>
 
-    <h2 class="section-title">Seus dados</h2>
-    <div class="panel">
-      <p class="hint">Tudo fica guardado só neste aparelho. Exporte de vez em quando para ter uma cópia nos Arquivos ou no iCloud.</p>
-      <button class="quiet" id="btn-export-csv">Exportar CSV</button>
-      <button class="quiet" id="btn-export-json">Exportar backup completo</button>
-      <button class="quiet" id="btn-import-json">Importar backup</button>
+  <!-- AJUSTES -->
+  <section class="view" id="view-config">
+    <h2 class="section-title">Dados</h2>
+    <p class="hint tight">Seus dados ficam guardados neste aparelho. Faça backups periódicos para manter uma cópia segura.</p>
+    <div class="list">
+      <button type="button" id="btn-export-csv">Exportar CSV<svg width="9" height="15" viewBox="0 0 9 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 1.5 7 7.5l-5.5 6"/></svg></button>
+      <button type="button" id="btn-export-json">Exportar backup<svg width="9" height="15" viewBox="0 0 9 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 1.5 7 7.5l-5.5 6"/></svg></button>
+      <button type="button" id="btn-import-json">Importar backup<svg width="9" height="15" viewBox="0 0 9 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 1.5 7 7.5l-5.5 6"/></svg></button>
       <input type="file" id="file-import" accept="application/json">
     </div>
 
-    <h2 class="section-title">Recomeçar</h2>
+    <h2 class="section-title">Armazenamento</h2>
+    <div class="list">
+      <div class="meta-row"><span class="k">Local</span><span>Neste iPhone</span></div>
+      <div class="meta-row" style="border-top:1px solid var(--sage-200);"><span class="k">Registros guardados</span><span id="meta-count">—</span></div>
+    </div>
+
+    <h2 class="section-title">Tags de contexto</h2>
     <div class="panel">
-      <p class="hint">Apaga registros e contagens deste aparelho. Não tem como desfazer.</p>
+      <p class="hint">Atalhos que aparecem abaixo do campo Contexto. Tocar em uma tag preenche o campo, que continua livre para escrever qualquer coisa.</p>
+      <div class="tag-add">
+        <input type="text" id="tag-input" placeholder="Nova tag" maxlength="24" autocapitalize="words" autocomplete="off">
+        <button type="button" id="btn-tag-add">Adicionar</button>
+      </div>
+      <div class="tag-list" id="tag-list"></div>
+    </div>
+
+    <h2 class="section-title">Zona de risco</h2>
+    <div class="panel">
+      <p class="hint">Apaga todos os registros e contagens deste aparelho. Esta ação não pode ser desfeita.</p>
       <button class="quiet danger" id="btn-reset">Apagar todos os dados</button>
     </div>
   </section>
 
 </main>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <nav class="tabs">
-  <button data-view="registro" class="active"><span class="mark"></span>Registro</button>
-  <button data-view="estoque"><span class="mark"></span>Estoque</button>
-  <button data-view="config"><span class="mark"></span>Ajustes</button>
+  <button data-view="registro" class="active" aria-label="Registro">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/><path d="M14 6l4 4"/></svg>
+    <span class="mark"></span>Registro
+  </button>
+  <button data-view="estoque" aria-label="Estoque">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 7.5l9 4.5 9-4.5Z"/><path d="M3 12.5 12 17l9-4.5"/><path d="M3 17 12 21.5 21 17"/></svg>
+    <span class="mark"></span>Estoque
+  </button>
+  <button data-view="config" aria-label="Ajustes">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2.2"/><circle cx="10" cy="17" r="2.2"/></svg>
+    <span class="mark"></span>Ajustes
+  </button>
 </nav>
 
 </div><!-- /#app -->
@@ -617,9 +839,12 @@
 (function(){
   "use strict";
 
-  /* Chaves mantidas idênticas à versão anterior para não perder nada já registrado. */
+  /* Chaves mantidas idênticas às versões anteriores para não perder nada já registrado. */
   var STORE_KEY = "dlcnh_records_v1";
   var STOCK_EVENTS_KEY = "dlcnh_stock_events_v1";
+  /* Chave própria: as tags são só atalhos de digitação e não tocam nos registros. */
+  var TAGS_KEY = "dlcnh_tags_v1";
+  var DEFAULT_TAGS = ["Recovery","Show","Social","Sono"];
   var editingId = null;
 
   // ---------- armazenamento ----------
@@ -633,10 +858,23 @@
   function saveStockEvents(list){ localStorage.setItem(STOCK_EVENTS_KEY, JSON.stringify(list)); }
   function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 
+  function loadTags(){
+    try{
+      var t = JSON.parse(localStorage.getItem(TAGS_KEY));
+      return Array.isArray(t) ? t : DEFAULT_TAGS.slice();
+    }catch(e){ return DEFAULT_TAGS.slice(); }
+  }
+  function saveTags(list){ localStorage.setItem(TAGS_KEY, JSON.stringify(list)); }
+
   // ---------- datas ----------
+  /* O valor gravado continua sempre em ISO (AAAA-MM-DD). Só a exibição muda. */
   function todayISO(){
     var d = new Date();
     return new Date(d - d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+  }
+  function nowHM(){
+    var d = new Date();
+    return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0");
   }
   function fmtBR(iso){
     if(!iso) return "—";
@@ -645,12 +883,30 @@
   }
   var WEEKDAYS = ["domingo","segunda-feira","terça-feira","quarta-feira","quinta-feira","sexta-feira","sábado"];
   var MONTHS = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+  var MONTHS_SHORT = ["jan.","fev.","mar.","abr.","mai.","jun.","jul.","ago.","set.","out.","nov.","dez."];
+
   function todayLabel(){
     var d = new Date();
     return WEEKDAYS[d.getDay()] + ", " + d.getDate() + " de " + MONTHS[d.getMonth()];
   }
+  /* "16 set." — sem ano, para listas e metadados */
+  function fmtShort(iso){
+    if(!iso) return "—";
+    var p = iso.split("-");
+    return parseInt(p[2],10) + " " + MONTHS_SHORT[parseInt(p[1],10)-1];
+  }
+  /* "16 set. 2026" — quando o ano importa */
+  function fmtShortYear(iso){
+    if(!iso) return "—";
+    return fmtShort(iso) + " " + iso.split("-")[0];
+  }
   function daysBetween(a,b){
     return Math.round((new Date(b+"T00:00:00") - new Date(a+"T00:00:00")) / 86400000);
+  }
+  function addDaysISO(iso, days){
+    var d = new Date(iso + "T00:00:00");
+    d.setDate(d.getDate() + days);
+    return new Date(d - d.getTimezoneOffset()*60000).toISOString().slice(0,10);
   }
   function fmtNum(n){
     n = Math.round(n*100)/100;
@@ -661,14 +917,17 @@
   var views = document.querySelectorAll(".view");
   var tabButtons = document.querySelectorAll("nav.tabs button");
   var mainEl = document.querySelector("main");
+  var screenTitle = document.getElementById("screen-title");
+  var TITLES = { registro:"Registro", estoque:"Estoque", config:"Ajustes" };
 
   function goTo(name){
     tabButtons.forEach(function(b){ b.classList.toggle("active", b.dataset.view === name); });
     views.forEach(function(v){ v.classList.remove("active"); });
     document.getElementById("view-" + name).classList.add("active");
+    screenTitle.textContent = TITLES[name] || "";
     mainEl.scrollTop = 0;
-    if(name === "estoque") renderStock();
-    if(name === "config") renderConfig();
+    if(name === "estoque"){ renderStock(); renderConfig(); }
+    if(name === "config"){ renderMeta(); renderTagList(); }
   }
   tabButtons.forEach(function(btn){
     btn.addEventListener("click", function(){ goTo(btn.dataset.view); });
@@ -705,9 +964,31 @@
   var btnCancelEdit = document.getElementById("btn-cancel-edit");
 
   fDate.value = todayISO();
+  fTime.value = nowHM();
+
+  /* atalhos de contexto: escrevem no mesmo campo de texto, sem nova estrutura de dados */
+  var chipsWrap = document.getElementById("ctx-chips");
+  function renderChips(){
+    var tags = loadTags();
+    chipsWrap.innerHTML = "";
+    if(tags.length === 0){
+      var none = document.createElement("div");
+      none.className = "none";
+      none.textContent = "Sem tags — adicione em Ajustes.";
+      chipsWrap.appendChild(none);
+      return;
+    }
+    tags.forEach(function(t){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.textContent = t;
+      b.addEventListener("click", function(){ fCtx.value = t; });
+      chipsWrap.appendChild(b);
+    });
+  }
 
   function clearAmounts(keepDate){
-    fD8.value = 0; fD9.value = 0; fTime.value = ""; fCtx.value = "";
+    fD8.value = 0; fD9.value = 0; fTime.value = nowHM(); fCtx.value = "";
     if(!keepDate) fDate.value = todayISO();
   }
   function exitEditMode(){
@@ -771,19 +1052,33 @@
       var when = document.createElement("div");
       when.className = "when";
       when.innerHTML =
-        '<span class="date">' + fmtBR(r.date) + (r.time ? " · " + r.time : "") + '</span>' +
+        '<span class="date">' + fmtShort(r.date) + (r.time ? " · " + r.time : "") + '</span>' +
         (r.ctx ? '<span class="ctx">' + escapeHTML(r.ctx) + '</span>' : "");
 
       var actions = document.createElement("div");
       actions.className = "actions";
-      var editLink = document.createElement("span");
-      editLink.textContent = "editar";
-      editLink.addEventListener("click", function(){ startEdit(r); });
-      var delLink = document.createElement("span");
-      delLink.textContent = "excluir";
-      delLink.addEventListener("click", function(){ deleteRecord(r.id); });
-      actions.appendChild(editLink);
-      actions.appendChild(delLink);
+
+      var editBtn = document.createElement("button");
+      editBtn.type = "button";
+      editBtn.textContent = "Editar";
+      editBtn.addEventListener("click", function(){ startEdit(r); });
+
+      var moreBtn = document.createElement("button");
+      moreBtn.type = "button";
+      moreBtn.className = "more";
+      moreBtn.textContent = "•••";
+      moreBtn.setAttribute("aria-label", "Mais ações para este registro");
+      moreBtn.addEventListener("click", function(){ row.classList.toggle("open"); });
+
+      var delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "del";
+      delBtn.textContent = "Excluir registro";
+      delBtn.addEventListener("click", function(){ deleteRecord(r.id); });
+
+      actions.appendChild(editBtn);
+      actions.appendChild(moreBtn);
+      actions.appendChild(delBtn);
       when.appendChild(actions);
 
       var amounts = document.createElement("div");
@@ -804,7 +1099,7 @@
     fDate.value = r.date;
     fD8.value = r.d8;
     fD9.value = r.d9;
-    fTime.value = r.time || "";
+    fTime.value = r.time || nowHM();
     fCtx.value = r.ctx || "";
     btnCancelEdit.style.display = "block";
     btnSave.textContent = "Salvar edição";
@@ -861,11 +1156,14 @@
     return { d8: sumD8/weeks, d9: sumD9/weeks };
   }
 
-  function weeksLeftText(stock, rate){
+  /* Mesmo cálculo de antes (estoque ÷ ritmo semanal), apresentado em dias e com data-alvo. */
+  function durationText(stock, rate){
     if(rate <= 0) return "sem consumo registrado";
-    var w = stock / rate;
-    if(w < 1) return "menos de 1 semana";
-    return "~" + fmtNum(Math.round(w*10)/10) + " semanas";
+    if(stock <= 0) return "estoque zerado";
+    var days = Math.round((stock / rate) * 7);
+    if(days < 1) return "menos de 1 dia";
+    if(days === 1) return "aprox. 1 dia";
+    return "aprox. " + days + " dias · até " + fmtShort(addDaysISO(todayISO(), days));
   }
 
   function renderStock(){
@@ -885,7 +1183,7 @@
       document.getElementById("avg-d8").textContent = "—";
       document.getElementById("avg-d9").textContent = "—";
       document.getElementById("last-count").textContent = "—";
-      alertBox.innerHTML = '<div class="note">Informe sua contagem atual abaixo para começar a acompanhar o estoque.</div>';
+      alertBox.innerHTML = '<div class="note">Informe sua contagem atual em Recontagem para começar a acompanhar o estoque.</div>';
       return;
     }
 
@@ -897,14 +1195,14 @@
     document.getElementById("gauge-d8").style.width = Math.max(0, Math.min(100, pct8)) + "%";
     document.getElementById("gauge-d9").style.width = Math.max(0, Math.min(100, pct9)) + "%";
 
-    document.getElementById("foot-d8-left").textContent = weeksLeftText(stock.d8, avg.d8);
-    document.getElementById("foot-d9-left").textContent = weeksLeftText(stock.d9, avg.d9);
-    document.getElementById("foot-d8-rate").textContent = avg.d8 > 0 ? fmtNum(avg.d8) + "/semana" : "";
-    document.getElementById("foot-d9-rate").textContent = avg.d9 > 0 ? fmtNum(avg.d9) + "/semana" : "";
+    document.getElementById("foot-d8-left").textContent = durationText(stock.d8, avg.d8);
+    document.getElementById("foot-d9-left").textContent = durationText(stock.d9, avg.d9);
+    document.getElementById("foot-d8-rate").textContent = avg.d8 > 0 ? fmtNum(avg.d8) + "/sem" : "";
+    document.getElementById("foot-d9-rate").textContent = avg.d9 > 0 ? fmtNum(avg.d9) + "/sem" : "";
 
     document.getElementById("avg-d8").textContent = fmtNum(avg.d8);
     document.getElementById("avg-d9").textContent = fmtNum(avg.d9);
-    document.getElementById("last-count").textContent = fmtBR(stock.since);
+    document.getElementById("last-count").textContent = fmtShortYear(stock.since);
 
     var total = stock.d8 + stock.d9;
     if(total <= 15){
@@ -926,11 +1224,12 @@
     document.getElementById("rc-d9").value = "";
     document.getElementById("rc-date").value = todayISO();
     renderStock();
+    renderConfig();
     mainEl.scrollTo({ top:0, behavior:"smooth" });
     toast("Contagem registrada");
   });
 
-  // ---------- ajustes ----------
+  // ---------- ajuste rápido de estoque (mesma lógica, agora na aba Estoque) ----------
   function renderConfig(){
     var stock = computeStock();
     var evt = latestStockEvent();
@@ -945,8 +1244,72 @@
     var events = loadStockEvents();
     events.push({ date:todayISO(), d8:d8, d9:d9 });
     saveStockEvents(events);
+    renderStock();
     toast("Estoque ajustado");
   });
+
+  // ---------- gerenciador de tags (Ajustes) ----------
+  var tagInput = document.getElementById("tag-input");
+  var tagListEl = document.getElementById("tag-list");
+
+  function renderTagList(){
+    var tags = loadTags();
+    tagListEl.innerHTML = "";
+    if(tags.length === 0){
+      var none = document.createElement("div");
+      none.className = "none";
+      none.textContent = "Nenhuma tag.";
+      tagListEl.appendChild(none);
+      return;
+    }
+    tags.forEach(function(t){
+      var item = document.createElement("div");
+      item.className = "tag-item";
+      var label = document.createElement("span");
+      label.textContent = t;
+      var rm = document.createElement("button");
+      rm.type = "button";
+      rm.textContent = "×";
+      rm.setAttribute("aria-label", "Remover a tag " + t);
+      rm.addEventListener("click", function(){ removeTag(t); });
+      item.appendChild(label);
+      item.appendChild(rm);
+      tagListEl.appendChild(item);
+    });
+  }
+
+  function addTag(){
+    var name = tagInput.value.trim();
+    if(!name){ toast("Escreva o nome da tag"); return; }
+    var tags = loadTags();
+    var exists = tags.some(function(t){ return t.toLowerCase() === name.toLowerCase(); });
+    if(exists){ toast("Essa tag já existe"); return; }
+    tags.push(name);
+    saveTags(tags);
+    tagInput.value = "";
+    renderTagList();
+    renderChips();
+    toast("Tag adicionada");
+  }
+
+  function removeTag(name){
+    saveTags(loadTags().filter(function(t){ return t !== name; }));
+    renderTagList();
+    renderChips();
+    toast("Tag removida");
+  }
+
+  document.getElementById("btn-tag-add").addEventListener("click", addTag);
+  tagInput.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); addTag(); }
+  });
+
+  // ---------- metadados da aba Ajustes ----------
+  function renderMeta(){
+    var n = loadRecords().length;
+    document.getElementById("meta-count").textContent =
+      n === 0 ? "nenhum" : (n === 1 ? "1 registro" : n + " registros");
+  }
 
   // ---------- exportação ----------
   function toCSV(){
@@ -986,12 +1349,12 @@
   }
 
   document.getElementById("btn-export-csv").addEventListener("click", function(){
-    shareOrDownload("\uFEFF" + toCSV(), "caderno_" + todayISO() + ".csv", "text/csv");
+    shareOrDownload("\uFEFF" + toCSV(), "dlcnh_" + todayISO() + ".csv", "text/csv");
   });
 
   document.getElementById("btn-export-json").addEventListener("click", function(){
-    var data = { records:loadRecords(), stockEvents:loadStockEvents(), exportedAt:new Date().toISOString() };
-    shareOrDownload(JSON.stringify(data, null, 2), "caderno_backup_" + todayISO() + ".json", "application/json");
+    var data = { records:loadRecords(), stockEvents:loadStockEvents(), tags:loadTags(), exportedAt:new Date().toISOString() };
+    shareOrDownload(JSON.stringify(data, null, 2), "dlcnh_backup_" + todayISO() + ".json", "application/json");
   });
 
   document.getElementById("btn-import-json").addEventListener("click", function(){
@@ -1007,7 +1370,9 @@
         var data = JSON.parse(reader.result);
         if(Array.isArray(data.records)) saveRecords(data.records);
         if(Array.isArray(data.stockEvents)) saveStockEvents(data.stockEvents);
-        renderRecent(); renderStock(); renderConfig();
+        if(Array.isArray(data.tags)) saveTags(data.tags);
+        renderRecent(); renderStock(); renderConfig(); renderMeta();
+        renderChips(); renderTagList();
         toast("Backup importado");
       }catch(err){
         toast("Esse arquivo não é um backup válido");
@@ -1033,16 +1398,23 @@
     clearTimeout(resetTimer);
     localStorage.removeItem(STORE_KEY);
     localStorage.removeItem(STOCK_EVENTS_KEY);
+    localStorage.removeItem(TAGS_KEY);
     resetArmed = false;
     btnReset.textContent = "Apagar todos os dados";
-    renderRecent(); renderStock(); renderConfig();
+    renderRecent(); renderStock(); renderConfig(); renderMeta();
+    renderChips(); renderTagList();
     toast("Dados apagados");
   });
 
   // ---------- início ----------
   renderRecent();
   renderStock();
+  renderConfig();
+  renderMeta();
+  renderChips();
+  renderTagList();
 })();
 </script>
+
 </body>
 </html>
