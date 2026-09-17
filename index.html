@@ -639,6 +639,182 @@
 
   input[type=file]{ display:none; }
 
+  /* ================= PADRÕES ================= */
+  .filters{ margin:var(--s-2) 0 var(--s-6); }
+  .segmented{
+    display:flex; gap:2px;
+    background:var(--field);
+    border-radius:999px;
+    padding:3px;
+  }
+  .segmented + .segmented{ margin-top:var(--s-2); }
+  .segmented button{
+    flex:1 1 0;
+    min-height:36px;
+    border:none; background:transparent;
+    border-radius:999px;
+    font-family:var(--sans); font-size:14px;
+    color:var(--sage-700);
+    transition:background var(--t), color var(--t);
+  }
+  .segmented button[aria-pressed="true"]{
+    background:var(--ivy-900); color:var(--ivory-50); font-weight:500;
+  }
+  .segmented button:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(120,145,129,.4); }
+
+  /* resumo */
+  .sum-grid{
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:var(--s-5) var(--s-4);
+  }
+  .sum-grid .cell .v{
+    font-family:var(--serif); font-size:34px; line-height:1;
+    font-variant-numeric:tabular-nums; letter-spacing:-0.018em;
+  }
+  .sum-grid .cell .k{
+    font-size:13.5px; color:var(--sage-700); margin-top:var(--s-1); line-height:1.35;
+  }
+  .sum-lines{
+    margin-top:var(--s-5); padding-top:var(--s-4);
+    border-top:1px solid var(--sage-200);
+  }
+  .sum-lines .ln{
+    display:flex; justify-content:space-between; align-items:baseline;
+    gap:var(--s-4); padding:var(--s-2) 0; font-size:15px;
+  }
+  .sum-lines .ln .k{ color:var(--sage-700); }
+  .sum-lines .ln .v{ font-variant-numeric:tabular-nums; }
+
+  /* linhas com barra (dia da semana, tags, horários) */
+  .barhead{
+    display:flex; justify-content:flex-end; gap:var(--s-5);
+    font-size:12px; color:var(--sage-600);
+    padding-bottom:var(--s-2);
+  }
+  .barhead span{ width:52px; text-align:right; }
+
+  .barrow{ padding:var(--s-3) 0; border-bottom:1px solid var(--sage-200); }
+  .barrow:last-child{ border-bottom:none; }
+  .barrow .top{
+    display:flex; align-items:baseline; gap:var(--s-3);
+    font-size:15px;
+  }
+  .barrow .top .nm{ flex:1 1 auto; min-width:0; }
+  .barrow .top .n1,.barrow .top .n2{
+    width:52px; text-align:right; font-variant-numeric:tabular-nums;
+  }
+  .barrow .top .n2{ color:var(--sage-700); }
+  .track{
+    height:6px; background:var(--sage-200);
+    border-radius:999px; overflow:hidden; margin-top:var(--s-2);
+  }
+  .track i{ display:block; height:100%; background:var(--ivy-900); border-radius:999px; }
+  .track.thin{ height:5px; }
+  .track i.d8{ background:var(--sage-500); }
+  .barrow .sub{ font-size:13.5px; color:var(--sage-700); margin-top:var(--s-2); }
+  .barrow .pair{ display:flex; flex-direction:column; gap:4px; margin-top:var(--s-2); }
+
+  /* heatmap */
+  .heat{
+    display:grid; grid-template-columns:repeat(7,1fr);
+    gap:6px;
+  }
+  .heat .dow{
+    font-size:11px; color:var(--sage-600); text-align:center; padding-bottom:2px;
+  }
+  .heat button{
+    aspect-ratio:1/1; width:100%;
+    border:none; border-radius:8px;
+    background:var(--field);
+    padding:0;
+    transition:transform var(--t), box-shadow var(--t);
+  }
+  .heat button.l1{ background:var(--sage-300); }
+  .heat button.l2{ background:var(--sage-500); }
+  .heat button.l3{ background:var(--ivy-800); }
+  .heat button.sel{ box-shadow:0 0 0 2px var(--ivy-900); }
+  .heat button.pad{ background:transparent; pointer-events:none; }
+  .heat button:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(120,145,129,.55); }
+  .heat-legend{
+    display:flex; align-items:center; gap:6px;
+    margin-top:var(--s-4); font-size:12.5px; color:var(--sage-700);
+  }
+  .heat-legend i{
+    width:12px; height:12px; border-radius:4px; display:inline-block;
+    background:var(--field);
+  }
+  .heat-legend i.l1{ background:var(--sage-300); }
+  .heat-legend i.l2{ background:var(--sage-500); }
+  .heat-legend i.l3{ background:var(--ivy-800); }
+  .heat-detail{
+    margin-top:var(--s-4); padding-top:var(--s-4);
+    border-top:1px solid var(--sage-200);
+    font-size:15px; line-height:1.5;
+  }
+  .heat-detail:empty{ display:none; }
+  .heat-detail .dt{ color:var(--sage-700); font-size:13.5px; }
+  .heat-foot{
+    margin-top:var(--s-3); font-size:14px; color:var(--sage-700);
+  }
+
+  /* colunas — últimas 8 semanas */
+  .cols{
+    display:flex; align-items:flex-end; gap:var(--s-2);
+    height:104px; margin-top:var(--s-2);
+  }
+  .cols .wk{
+    flex:1 1 0; display:flex; align-items:flex-end; justify-content:center;
+    gap:3px; height:100%;
+  }
+  .cols .wk b{
+    display:block; width:100%; max-width:16px;
+    background:var(--ivy-900);
+    border-radius:999px 999px 4px 4px;
+    min-height:2px;
+  }
+  .cols .wk b.d8{ background:var(--sage-500); }
+  .cols-x{
+    display:flex; justify-content:space-between;
+    margin-top:var(--s-3); font-size:12.5px; color:var(--sage-700);
+  }
+  .legend{
+    display:flex; gap:var(--s-4); margin-top:var(--s-3);
+    font-size:13px; color:var(--sage-700);
+  }
+  .legend span{ display:flex; align-items:center; gap:6px; }
+  .legend i{ width:10px; height:10px; border-radius:3px; background:var(--ivy-900); }
+  .legend i.d8{ background:var(--sage-500); }
+
+  /* padrões observados */
+  .obs{ padding:var(--s-4) 0; border-bottom:1px solid var(--sage-200); }
+  .obs:first-child{ padding-top:0; }
+  .obs:last-child{ border-bottom:none; padding-bottom:0; }
+  .obs .t{
+    font-size:12.5px; letter-spacing:0.1em; color:var(--sage-700);
+  }
+  .obs .d{
+    font-family:var(--serif); font-size:19px; margin-top:var(--s-1); line-height:1.35;
+  }
+
+  /* estados vazios / nota */
+  .editorial{
+    font-family:var(--serif); font-size:17px; line-height:1.55;
+    color:var(--ivy-800);
+  }
+  .editorial small{
+    display:block; font-family:var(--sans); font-size:14.5px;
+    color:var(--sage-700); margin-top:var(--s-3); line-height:1.5;
+  }
+  .infonote{
+    display:flex; gap:var(--s-2); align-items:flex-start;
+    margin-top:var(--s-4); padding-top:var(--s-4);
+    border-top:1px solid var(--sage-200);
+    font-size:13.5px; color:var(--sage-700); line-height:1.45;
+  }
+  .infonote b{
+    flex:0 0 auto; font-weight:400; color:var(--sage-600);
+  }
+
   @media (prefers-reduced-motion: reduce){
     *{ transition:none !important; }
     section.view.active{ animation:none; }
@@ -818,6 +994,23 @@
     </div>
   </section>
 
+  <!-- PADRÕES -->
+  <section class="view" id="view-padroes">
+    <div class="filters">
+      <div class="segmented" id="seg-period" role="group" aria-label="Período">
+        <button type="button" data-period="30" aria-pressed="true">30 dias</button>
+        <button type="button" data-period="90" aria-pressed="false">90 dias</button>
+        <button type="button" data-period="all" aria-pressed="false">Tudo</button>
+      </div>
+      <div class="segmented" id="seg-subst" role="group" aria-label="Substância">
+        <button type="button" data-subst="d8" aria-pressed="false">D8</button>
+        <button type="button" data-subst="d9" aria-pressed="false">D9</button>
+        <button type="button" data-subst="both" aria-pressed="true">Ambos</button>
+      </div>
+    </div>
+    <div id="pat-body"></div>
+  </section>
+
   <!-- AJUSTES -->
   <section class="view" id="view-config">
     <h2 class="section-title">Dados</h2>
@@ -864,6 +1057,10 @@
   <button data-view="estoque" aria-label="Estoque">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 7.5l9 4.5 9-4.5Z"/><path d="M3 12.5 12 17l9-4.5"/><path d="M3 17 12 21.5 21 17"/></svg>
     <span class="mark"></span>Estoque
+  </button>
+  <button data-view="padroes" aria-label="Padrões">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V12M12 20V5M19 20v-5"/></svg>
+    <span class="mark"></span>Padrões
   </button>
   <button data-view="config" aria-label="Ajustes">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2.2"/><circle cx="10" cy="17" r="2.2"/></svg>
@@ -956,7 +1153,7 @@
   var tabButtons = document.querySelectorAll("nav.tabs button");
   var mainEl = document.querySelector("main");
   var screenTitle = document.getElementById("screen-title");
-  var TITLES = { registro:"Registro", estoque:"Estoque", config:"Ajustes" };
+  var TITLES = { registro:"Registro", estoque:"Estoque", padroes:"Padrões", config:"Ajustes" };
 
   function goTo(name){
     tabButtons.forEach(function(b){ b.classList.toggle("active", b.dataset.view === name); });
@@ -965,6 +1162,7 @@
     screenTitle.textContent = TITLES[name] || "";
     mainEl.scrollTop = 0;
     if(name === "estoque"){ renderStock(); renderConfig(); }
+    if(name === "padroes") renderPatterns();
     if(name === "config"){ renderMeta(); renderTagList(); }
   }
   tabButtons.forEach(function(btn){
@@ -1068,6 +1266,7 @@
       toast("Registrado");
     }
     renderRecent();
+    renderPatterns();
   });
 
   btnCancelEdit.addEventListener("click", function(){
@@ -1164,6 +1363,7 @@
   function deleteRecord(id){
     saveRecords(loadRecords().filter(function(r){ return r.id !== id; }));
     renderRecent();
+    renderPatterns();
     toast("Registro excluído");
   }
 
@@ -1433,6 +1633,518 @@
       n === 0 ? "nenhum" : (n === 1 ? "1 registro" : n + " registros");
   }
 
+
+  /* ================= PADRÕES =================
+     Tudo aqui é derivado dos registros existentes em tempo real.
+     Nada é gravado no localStorage: estes números são sempre recalculáveis. */
+
+  var patPeriod = "30";     // "30" | "90" | "all"
+  var patSubst  = "both";   // "d8" | "d9" | "both"
+  var heatSelected = null;
+
+  // ---- utilitários de data (sempre em horário local, via string ISO) ----
+  function isoOf(d){
+    return new Date(d - d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+  }
+  function weekdayOf(iso){            // 0=Seg ... 6=Dom
+    var js = new Date(iso + "T00:00:00").getDay();   // 0=Dom
+    return (js + 6) % 7;
+  }
+  var WD_SHORT = ["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"];
+  var WD_LONG  = ["Segunda-feira","Terça-feira","Quarta-feira","Quinta-feira","Sexta-feira","Sábado","Domingo"];
+
+  function fmtDec(n){
+    if(!isFinite(n)) return "—";
+    var r = Math.round(n*100)/100;
+    return r.toLocaleString("pt-BR", { maximumFractionDigits:2 });
+  }
+
+  // ---- seleção de dados ----
+  function getPeriodRange(records){
+    var end = todayISO();
+    if(patPeriod === "all"){
+      var earliest = end;
+      records.forEach(function(r){ if(r.date < earliest) earliest = r.date; });
+      return { start: earliest, end: end };
+    }
+    var n = patPeriod === "90" ? 90 : 30;
+    return { start: addDaysISO(end, -(n-1)), end: end };
+  }
+  function qtyOf(r, which){
+    if(which === "d8") return r.d8 || 0;
+    if(which === "d9") return r.d9 || 0;
+    return (r.d8 || 0) + (r.d9 || 0);
+  }
+  /* Um registro só conta como evento se tiver quantidade > 0 da substância filtrada. */
+  function isEvent(r){ return qtyOf(r, patSubst) > 0; }
+
+  function getRecordsForPeriod(records, range){
+    return records.filter(function(r){
+      return r.date >= range.start && r.date <= range.end && isEvent(r);
+    });
+  }
+  function daysInRange(range){ return daysBetween(range.start, range.end) + 1; }
+
+  function tagsOf(r){ return Array.isArray(r.tags) ? r.tags : []; }
+
+  // ---- estatísticas ----
+  function getSummaryStats(recs, range){
+    var days = daysInRange(range);
+    var activeDays = {};
+    var totD8 = 0, totD9 = 0;
+    recs.forEach(function(r){
+      activeDays[r.date] = true;
+      totD8 += r.d8 || 0; totD9 += r.d9 || 0;
+    });
+    var activeDayCount = Object.keys(activeDays).length;
+    return {
+      recordCount: recs.length,
+      activeDayCount: activeDayCount,
+      idleDayCount: Math.max(0, days - activeDayCount),
+      recordsPerWeek: recs.length / (days/7),
+      totalD8: totD8,
+      totalD9: totD9,
+      totalQuantity: qtyOf({d8:totD8, d9:totD9}, patSubst),
+      days: days
+    };
+  }
+
+  function getIntervalStats(recs){
+    var dates = Object.keys(recs.reduce(function(a,r){ a[r.date]=1; return a; },{})).sort();
+    if(dates.length < 2) return { avg:null, max:null, dates:dates };
+    var gaps = [];
+    for(var i=1;i<dates.length;i++) gaps.push(daysBetween(dates[i-1], dates[i]));
+    return {
+      avg: gaps.reduce(function(a,b){ return a+b; },0) / gaps.length,
+      max: Math.max.apply(null, gaps),
+      dates: dates
+    };
+  }
+
+  /* Média por dia da semana usa como denominador TODAS as ocorrências daquele
+     weekday no período — inclusive as sem registro, que contam como zero. */
+  function getWeekdayStats(recs, range){
+    var occur = [0,0,0,0,0,0,0];      // quantas segundas, terças... existem no período
+    var cur = range.start;
+    while(cur <= range.end){
+      occur[weekdayOf(cur)]++;
+      cur = addDaysISO(cur, 1);
+    }
+    var totD8 = [0,0,0,0,0,0,0], totD9 = [0,0,0,0,0,0,0];
+    var activeByWd = [{},{},{},{},{},{},{}];
+    recs.forEach(function(r){
+      var w = weekdayOf(r.date);
+      totD8[w] += r.d8 || 0;
+      totD9[w] += r.d9 || 0;
+      activeByWd[w][r.date] = true;
+    });
+    return WD_SHORT.map(function(name,w){
+      var total = qtyOf({ d8:totD8[w], d9:totD9[w] }, patSubst);
+      var activeDays = Object.keys(activeByWd[w]).length;
+      return {
+        name: name, long: WD_LONG[w],
+        occurrences: occur[w],
+        total: total, d8: totD8[w], d9: totD9[w],
+        average: occur[w] > 0 ? total / occur[w] : 0,
+        activeDays: activeDays,
+        frequency: occur[w] > 0 ? activeDays / occur[w] : 0
+      };
+    });
+  }
+
+  function getHeatmapData(records){
+    var end = todayISO();
+    var start = addDaysISO(end, -29);
+    var byDate = {};
+    records.forEach(function(r){
+      if(r.date < start || r.date > end) return;
+      if(!isEvent(r)) return;
+      if(!byDate[r.date]) byDate[r.date] = { d8:0, d9:0, tags:{} };
+      byDate[r.date].d8 += r.d8 || 0;
+      byDate[r.date].d9 += r.d9 || 0;
+      tagsOf(r).forEach(function(t){ byDate[r.date].tags[t] = true; });
+    });
+    var cells = [], cur = start, maxQ = 0;
+    while(cur <= end){
+      var e = byDate[cur];
+      var q = e ? qtyOf(e, patSubst) : 0;
+      if(q > maxQ) maxQ = q;
+      cells.push({ date:cur, qty:q, d8:e?e.d8:0, d9:e?e.d9:0, tags:e?Object.keys(e.tags):[] });
+      cur = addDaysISO(cur, 1);
+    }
+    cells.forEach(function(c){
+      c.level = c.qty <= 0 ? 0 : (maxQ <= 0 ? 0 : (c.qty/maxQ <= 0.34 ? 1 : (c.qty/maxQ <= 0.67 ? 2 : 3)));
+    });
+    return { cells:cells, active:cells.filter(function(c){ return c.qty>0; }).length, total:cells.length };
+  }
+
+  /* Um registro com várias tags participa da métrica de cada uma delas. */
+  function getTagStats(recs){
+    var known = loadTags();
+    var map = {};
+    function ensure(t){ if(!map[t]) map[t] = { tag:t, n:0, d8:0, d9:0 }; return map[t]; }
+    recs.forEach(function(r){
+      tagsOf(r).forEach(function(t){
+        var m = ensure(t);
+        m.n++; m.d8 += r.d8 || 0; m.d9 += r.d9 || 0;
+      });
+    });
+    known.forEach(ensure);   // tags cadastradas aparecem mesmo zeradas
+    return Object.keys(map).map(function(k){
+      var m = map[k];
+      m.total = qtyOf(m, patSubst);
+      m.average = m.n > 0 ? m.total / m.n : 0;
+      m.avgD8 = m.n > 0 ? m.d8/m.n : 0;
+      m.avgD9 = m.n > 0 ? m.d9/m.n : 0;
+      return m;
+    }).sort(function(a,b){ return b.n - a.n || b.total - a.total || a.tag.localeCompare(b.tag,"pt-BR"); });
+  }
+
+  var TIME_BUCKETS = [
+    { label:"00–06", from:0,  to:6  },
+    { label:"06–12", from:6,  to:12 },
+    { label:"12–18", from:12, to:18 },
+    { label:"18–00", from:18, to:24 }
+  ];
+  function getTimeBucketStats(recs){
+    var out = TIME_BUCKETS.map(function(b){ return { label:b.label, n:0, total:0 }; });
+    var withTime = 0;
+    recs.forEach(function(r){
+      if(!r.time || !/^\d{1,2}:\d{2}$/.test(r.time)) return;   // registros antigos sem horário saem só desta análise
+      var h = parseInt(r.time.split(":")[0], 10);
+      if(isNaN(h) || h < 0 || h > 23) return;
+      var i = TIME_BUCKETS.findIndex(function(b){ return h >= b.from && h < b.to; });
+      if(i < 0) return;
+      withTime++;
+      out[i].n++;
+      out[i].total += qtyOf(r, patSubst);
+    });
+    out.forEach(function(b){ b.average = b.n > 0 ? b.total/b.n : 0; });
+    return { buckets:out, withTime:withTime, ignored:recs.length - withTime };
+  }
+
+  /* Semanas de segunda a domingo, sempre as 8 últimas até a semana atual. */
+  function getWeeklyTrend(records){
+    var today = todayISO();
+    var monday = addDaysISO(today, -weekdayOf(today));
+    var weeks = [];
+    for(var i=7;i>=0;i--){
+      var ws = addDaysISO(monday, -7*i);
+      weeks.push({ start:ws, end:addDaysISO(ws,6), d8:0, d9:0 });
+    }
+    records.forEach(function(r){
+      if(!isEvent(r)) return;
+      for(var i=0;i<weeks.length;i++){
+        if(r.date >= weeks[i].start && r.date <= weeks[i].end){
+          weeks[i].d8 += r.d8 || 0; weeks[i].d9 += r.d9 || 0;
+          break;
+        }
+      }
+    });
+    weeks.forEach(function(w){ w.total = qtyOf(w, patSubst); });
+    return weeks;
+  }
+
+  /* Observações estritamente descritivas — sem juízo de valor nem causa. */
+  function getObservedPatterns(recs, wd, tags, times, heat){
+    var out = [];
+    var best = wd.slice().sort(function(a,b){ return b.average - a.average; })[0];
+    var distinct = {};
+    wd.forEach(function(d){ distinct[Math.round(d.average*100)] = 1; });
+    if(best && best.average > 0 && Object.keys(distinct).length >= 2){
+      out.push({ t: best.long.toUpperCase(), d: "maior média do período · " + fmtDec(best.average) });
+    }
+    var topTime = times.buckets.slice().sort(function(a,b){ return b.n - a.n; })[0];
+    if(topTime && topTime.n > 0 && times.withTime > 0){
+      out.push({ t: topTime.label, d: topTime.n + " de " + times.withTime + " registros com horário" });
+    }
+    var topTag = tags.filter(function(t){ return t.n > 0; })[0];
+    if(topTag){
+      out.push({ t: topTag.tag.toUpperCase(), d: "contexto mais frequente · presente em " + topTag.n + " de " + recs.length + " registros" });
+    }
+    out.push({ t:"ÚLTIMOS 30 DIAS", d: heat.active + (heat.active === 1 ? " dia com registro" : " dias com registro") });
+    return out;
+  }
+
+  // ---- renderização ----
+  var patBody = document.getElementById("pat-body");
+
+  function esc(s){ return escapeHTML(String(s)); }
+  function pct(x){ return Math.round(x*100); }
+  function barWidth(v, max){ return max > 0 ? Math.max(v > 0 ? 3 : 0, (v/max)*100) : 0; }
+
+  function sectionTitle(t){ return '<h2 class="section-title">' + t + '</h2>'; }
+
+  function renderSummary(s, iv){
+    var qtyCell = patSubst === "both"
+      ? '<span class="v">' + fmtDec(s.totalD8) + " · " + fmtDec(s.totalD9) + '</span>'
+      : '<span class="v">' + fmtDec(s.totalQuantity) + '</span>';
+    var qtyLabel = patSubst === "both" ? "Quantidade · D8 · D9" : "Quantidade total";
+    return sectionTitle("Resumo") +
+      '<div class="panel"><div class="sum-grid">' +
+        '<div class="cell"><div class="v">' + s.recordCount + '</div><div class="k">registros</div></div>' +
+        '<div class="cell"><div class="v">' + s.activeDayCount + '</div><div class="k">dias com registro</div></div>' +
+        '<div class="cell"><div class="v">' + fmtDec(s.recordsPerWeek) + '</div><div class="k">registros por semana</div></div>' +
+        '<div class="cell"><div class="v">' + s.idleDayCount + '</div><div class="k">dias sem registro</div></div>' +
+      '</div><div class="sum-lines">' +
+        '<div class="ln"><span class="k">' + qtyLabel + '</span>' + qtyCell + '</div>' +
+        '<div class="ln"><span class="k">Intervalo médio</span><span class="v">' +
+          (iv.avg === null ? "—" : fmtDec(iv.avg) + " dias") + '</span></div>' +
+      '</div></div>';
+  }
+
+  function renderWeekday(wd){
+    var max = Math.max.apply(null, wd.map(function(d){ return d.total; }).concat([0]));
+    var maxSplit = Math.max.apply(null, wd.map(function(d){ return Math.max(d.d8,d.d9); }).concat([0]));
+    var rows = wd.map(function(d){
+      var label = d.long + ": total " + fmtDec(d.total) + ", média " + fmtDec(d.average);
+      var bar = patSubst === "both"
+        ? '<div class="pair">' +
+            '<div class="track thin"><i class="d8" style="width:' + barWidth(d.d8, maxSplit) + '%"></i></div>' +
+            '<div class="track thin"><i style="width:' + barWidth(d.d9, maxSplit) + '%"></i></div>' +
+          '</div>'
+        : '<div class="track"><i style="width:' + barWidth(d.total, max) + '%"></i></div>';
+      var sub = patSubst === "both"
+        ? '<div class="sub">D8 ' + fmtDec(d.d8) + " · D9 " + fmtDec(d.d9) + '</div>' : "";
+      return '<div class="barrow" role="group" aria-label="' + esc(label) + '">' +
+        '<div class="top"><span class="nm">' + d.name + '</span>' +
+        '<span class="n1">' + fmtDec(d.total) + '</span><span class="n2">' + fmtDec(d.average) + '</span></div>' +
+        bar + sub + '</div>';
+    }).join("");
+    return sectionTitle("Por dia da semana") +
+      '<div class="panel"><div class="barhead"><span>total</span><span>média</span></div>' + rows +
+      (patSubst === "both" ? '<div class="legend"><span><i class="d8"></i>D8</span><span><i></i>D9</span></div>' : "") +
+      '<div class="infonote"><b>ⓘ</b><span>A média divide o total pelo número de vezes que aquele dia ocorreu no período, contando os dias sem registro como zero.</span></div>' +
+      '</div>';
+  }
+
+  function renderFrequency(wd){
+    var rows = wd.map(function(d){
+      return '<div class="barrow" role="group" aria-label="' + esc(d.long + ": registro em " + pct(d.frequency) + "% das ocorrências") + '">' +
+        '<div class="top"><span class="nm">' + d.name + '</span>' +
+        '<span class="n1">' + pct(d.frequency) + '%</span></div>' +
+        '<div class="track thin"><i style="width:' + (d.frequency*100) + '%"></i></div>' +
+        '<div class="sub">' + d.activeDays + " de " + d.occurrences + '</div></div>';
+    }).join("");
+    return sectionTitle("Frequência") +
+      '<div class="panel">' + rows +
+      '<div class="infonote"><b>ⓘ</b><span>Porcentagem das ocorrências daquele dia da semana em que houve algum registro.</span></div></div>';
+  }
+
+  function renderHeatmap(heat){
+    var pad = weekdayOf(heat.cells[0].date);
+    var cells = "";
+    for(var i=0;i<pad;i++) cells += '<button class="pad" tabindex="-1" aria-hidden="true"></button>';
+    heat.cells.forEach(function(c){
+      var lbl = fmtShort(c.date) + ": " + (c.qty > 0 ? "D8 " + fmtDec(c.d8) + ", D9 " + fmtDec(c.d9) : "sem registro");
+      cells += '<button class="l' + c.level + (heatSelected === c.date ? " sel" : "") +
+        '" data-date="' + c.date + '" aria-label="' + esc(lbl) + '"></button>';
+    });
+    var dows = WD_SHORT.map(function(d){ return '<div class="dow">' + d[0] + '</div>'; }).join("");
+    var sel = "";
+    if(heatSelected){
+      var c = heat.cells.filter(function(x){ return x.date === heatSelected; })[0];
+      if(c){
+        sel = '<div class="heat-detail"><div class="dt">' + fmtShort(c.date) + '</div>' +
+          (c.qty > 0
+            ? "D8 " + fmtDec(c.d8) + " · D9 " + fmtDec(c.d9) +
+              (c.tags.length ? '<div class="dt">' + esc(c.tags.join(" · ")) + '</div>' : "")
+            : "Sem registro") + '</div>';
+      }
+    }
+    return sectionTitle("Últimos 30 dias") +
+      '<div class="panel">' +
+        '<div class="heat" aria-hidden="true">' + dows + '</div>' +
+        '<div class="heat" id="heat-grid" style="margin-top:4px;">' + cells + '</div>' +
+        '<div class="heat-legend"><span>menos</span><i></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><span>mais</span></div>' +
+        '<div class="heat-foot">' + heat.active + " dias com registro · " + (heat.total - heat.active) + ' sem registro</div>' +
+        sel +
+      '</div>';
+  }
+
+  function renderTags(tags, recCount){
+    var used = tags.filter(function(t){ return t.n > 0; });
+    if(used.length === 0){
+      return sectionTitle("Contextos") +
+        '<div class="panel"><div class="editorial">Nenhuma tag marcada neste período.<small>Marque tags ao registrar para ver quais contextos aparecem mais.</small></div></div>';
+    }
+    var max = Math.max.apply(null, used.map(function(t){ return t.n; }));
+    var rows = used.map(function(t){
+      var sub = patSubst === "both"
+        ? "D8 média " + fmtDec(t.avgD8) + " · D9 média " + fmtDec(t.avgD9)
+        : fmtDec(t.total) + " total · média " + fmtDec(t.average);
+      return '<div class="barrow" role="group" aria-label="' + esc(t.tag + ": " + t.n + " registros, " + sub) + '">' +
+        '<div class="top"><span class="nm">' + esc(t.tag) + '</span><span class="n1">' + t.n + '</span></div>' +
+        '<div class="track"><i style="width:' + barWidth(t.n, max) + '%"></i></div>' +
+        '<div class="sub">' + sub + ' · ' + t.n + (t.n === 1 ? " registro" : " registros") + '</div></div>';
+    }).join("");
+    return sectionTitle("Contextos") +
+      '<div class="panel">' + rows +
+      '<div class="infonote"><b>ⓘ</b><span>Registros com mais de uma tag participam de cada contexto selecionado.</span></div></div>';
+  }
+
+  function renderTimes(times){
+    if(times.withTime === 0){
+      return sectionTitle("Horários") +
+        '<div class="panel"><div class="editorial">Nenhum registro com horário neste período.</div></div>';
+    }
+    var max = Math.max.apply(null, times.buckets.map(function(b){ return b.n; }));
+    var rows = times.buckets.map(function(b){
+      return '<div class="barrow" role="group" aria-label="' + esc(b.label + ": " + b.n + " registros, média " + fmtDec(b.average)) + '">' +
+        '<div class="top"><span class="nm">' + b.label + '</span><span class="n1">' + b.n + '</span></div>' +
+        '<div class="track"><i style="width:' + barWidth(b.n, max) + '%"></i></div>' +
+        '<div class="sub">média ' + fmtDec(b.average) + '</div></div>';
+    }).join("");
+    var ign = times.ignored > 0
+      ? '<div class="infonote"><b>ⓘ</b><span>' + times.ignored + (times.ignored === 1 ? " registro sem horário não entra" : " registros sem horário não entram") + ' nesta análise.</span></div>'
+      : "";
+    return sectionTitle("Horários") + '<div class="panel">' + rows + ign + '</div>';
+  }
+
+  function renderTrend(weeks){
+    var max = Math.max.apply(null, weeks.map(function(w){
+      return patSubst === "both" ? Math.max(w.d8, w.d9) : w.total;
+    }).concat([0]));
+    var bars = weeks.map(function(w){
+      var lbl = "Semana de " + fmtShort(w.start) + ": " +
+        (patSubst === "both" ? "D8 " + fmtDec(w.d8) + ", D9 " + fmtDec(w.d9) : fmtDec(w.total));
+      var inner = patSubst === "both"
+        ? '<b class="d8" style="height:' + barWidth(w.d8, max) + '%"></b><b style="height:' + barWidth(w.d9, max) + '%"></b>'
+        : '<b style="height:' + barWidth(w.total, max) + '%"></b>';
+      return '<div class="wk" role="img" aria-label="' + esc(lbl) + '">' + inner + '</div>';
+    }).join("");
+    return sectionTitle("Últimas 8 semanas") +
+      '<div class="panel"><div class="cols">' + bars + '</div>' +
+      '<div class="cols-x"><span>' + fmtShort(weeks[0].start) + '</span><span>' +
+        fmtShort(weeks[4].start) + '</span><span>' + fmtShort(weeks[7].start) + '</span></div>' +
+      (patSubst === "both" ? '<div class="legend"><span><i class="d8"></i>D8</span><span><i></i>D9</span></div>' : "") +
+      '</div>';
+  }
+
+  function renderIntervals(iv, allRecs){
+    var last = null;
+    allRecs.forEach(function(r){
+      if(!last || r.date + (r.time||"") > last.date + (last.time||"")) last = r;
+    });
+    var lastTxt = "—";
+    if(last){
+      var d = daysBetween(last.date, todayISO());
+      var when = d === 0 ? "hoje" : (d === 1 ? "ontem" : fmtShort(last.date));
+      lastTxt = when + (last.time ? " · " + last.time : "");
+    }
+    return sectionTitle("Intervalos") +
+      '<div class="panel"><div class="sum-lines" style="margin-top:0;padding-top:0;border-top:none;">' +
+        '<div class="ln"><span class="k">Intervalo médio</span><span class="v">' +
+          (iv.avg === null ? "—" : fmtDec(iv.avg) + " dias") + '</span></div>' +
+        '<div class="ln"><span class="k">Maior intervalo</span><span class="v">' +
+          (iv.max === null ? "—" : fmtDec(iv.max) + " dias") + '</span></div>' +
+        '<div class="ln"><span class="k">Último registro</span><span class="v">' + esc(lastTxt) + '</span></div>' +
+      '</div></div>';
+  }
+
+  function renderObserved(list){
+    if(list.length === 0) return "";
+    return sectionTitle("Padrões observados") +
+      '<div class="panel">' + list.map(function(o){
+        return '<div class="obs"><div class="t">' + esc(o.t) + '</div><div class="d">' + esc(o.d) + '</div></div>';
+      }).join("") + '</div>';
+  }
+
+  function emptyState(title, msg, extra){
+    return sectionTitle(title) +
+      '<div class="panel"><div class="editorial">' + msg +
+      (extra ? '<small>' + extra + '</small>' : "") + '</div></div>';
+  }
+
+  function renderPatterns(){
+    var records = loadRecords();                  // uma leitura por render
+    var range = getPeriodRange(records);
+    var recs = getRecordsForPeriod(records, range);
+    var heat = getHeatmapData(records);
+    var html = "";
+
+    if(recs.length === 0){
+      html = emptyState("Padrões",
+        "Ainda não há registros neste recorte.",
+        "Assim que você registrar, as comparações por dia, horário e contexto começam a aparecer aqui.");
+      patBody.innerHTML = html;
+      return;
+    }
+
+    var summary = getSummaryStats(recs, range);
+    var iv = getIntervalStats(recs);
+    html += renderSummary(summary, iv);
+
+    if(recs.length < 3){
+      html += renderHeatmap(heat);
+      html += emptyState("Mais padrões",
+        "Ainda estamos formando este padrão.",
+        "Continue registrando normalmente. Com mais alguns dias, as comparações por dia da semana e por horário começam a aparecer aqui.");
+      patBody.innerHTML = html;
+      bindHeatmap();
+      return;
+    }
+
+    var tags = getTagStats(recs);
+    var times = getTimeBucketStats(recs);
+
+    if(recs.length < 5){
+      html += renderHeatmap(heat);
+      html += renderTimes(times);
+      html += renderTags(tags, recs.length);
+      html += emptyState("Mais padrões",
+        "Faltam poucos registros para as comparações completas.",
+        "Com cinco ou mais registros no período, aparecem aqui a análise por dia da semana, a evolução por semana e os padrões observados.");
+      patBody.innerHTML = html;
+      bindHeatmap();
+      return;
+    }
+
+    var wd = getWeekdayStats(recs, range);
+    html += renderWeekday(wd);
+    html += renderFrequency(wd);
+    html += renderHeatmap(heat);
+    html += renderTags(tags, recs.length);
+    html += renderTimes(times);
+    html += renderTrend(getWeeklyTrend(records));
+    html += renderIntervals(iv, recs);
+    html += renderObserved(getObservedPatterns(recs, wd, tags, times, heat));
+
+    patBody.innerHTML = html;
+    bindHeatmap();
+  }
+
+  function bindHeatmap(){
+    var grid = document.getElementById("heat-grid");
+    if(!grid) return;
+    grid.addEventListener("click", function(e){
+      var btn = e.target.closest ? e.target.closest("button[data-date]") : null;
+      if(!btn) return;
+      heatSelected = (heatSelected === btn.dataset.date) ? null : btn.dataset.date;
+      renderPatterns();
+    });
+  }
+
+  // filtros
+  document.querySelectorAll("#seg-period button").forEach(function(b){
+    b.addEventListener("click", function(){
+      patPeriod = b.dataset.period;
+      document.querySelectorAll("#seg-period button").forEach(function(x){
+        x.setAttribute("aria-pressed", x === b ? "true" : "false");
+      });
+      renderPatterns();
+    });
+  });
+  document.querySelectorAll("#seg-subst button").forEach(function(b){
+    b.addEventListener("click", function(){
+      patSubst = b.dataset.subst;
+      document.querySelectorAll("#seg-subst button").forEach(function(x){
+        x.setAttribute("aria-pressed", x === b ? "true" : "false");
+      });
+      renderPatterns();
+    });
+  });
+
   // ---------- exportação ----------
   function toCSV(){
     var rows = [["Data","Horário","D8","D9","Tags","Contexto"]];
@@ -1495,7 +2207,7 @@
         if(Array.isArray(data.stockEvents)) saveStockEvents(data.stockEvents);
         if(Array.isArray(data.tags)) saveTags(data.tags);
         renderRecent(); renderStock(); renderConfig(); renderMeta();
-        renderChips(); renderTagList();
+        renderChips(); renderTagList(); renderPatterns();
         toast("Backup importado");
       }catch(err){
         toast("Esse arquivo não é um backup válido");
@@ -1525,7 +2237,7 @@
     resetArmed = false;
     btnReset.textContent = "Apagar todos os dados";
     renderRecent(); renderStock(); renderConfig(); renderMeta();
-    renderChips(); renderTagList();
+    renderChips(); renderTagList(); renderPatterns();
     toast("Dados apagados");
   });
 
@@ -1536,6 +2248,7 @@
   renderMeta();
   renderChips();
   renderTagList();
+  renderPatterns();
 })();
 </script>
 
