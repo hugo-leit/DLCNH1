@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Caderno</title>
+<meta name="color-scheme" content="light only">
+<meta name="supported-color-schemes" content="light">
+<meta name="theme-color" content="#F4F6F2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Caderno">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+  :root{
+    color-scheme: light only;
+
+    --bg:#F4F6F2;          /* branco mineral, levemente verde */
+    --surface:#FFFFFF;      /* camada por contraste de luz, não por sombra */
+    --ink:#1E3A2D;          /* verde-hera profundo no lugar de preto */
+    --ink-mid:#4A6355;
+    --ink-soft:#7C9484;     /* eucalipto dessaturado */
+    --line:#DCE1D6;
+    --line-fine:#E8ECE4;
+    --wash:#EDF1E9;         /* realce discreto */
+    --accent:#3E6B52;       /* verde vivo, usado com parcimônia */
+    --warn:#A2624E;         /* terracota apagado, só para alerta */
+    --warn-wash:#F5EBE5;
+
+    --serif: ui-serif, "New York", "Iowan Old Style", Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+
+    --ease: cubic-bezier(.32,.72,.28,1);
+  }
+
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  html,body{
+    margin:0; padding:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:16px;
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden;
+    overscroll-behavior:none;
+  }
+
+  /* Casca de altura real do viewport: acompanha a barra do Safari e o teclado,
+     então cabeçalho e navegação nunca saltam durante a rolagem. */
+  #app{
+    height:100vh;
+    height:100dvh;
+    display:flex;
+    flex-direction:column;
+  }
+
+  ::selection{ background:var(--wash); }
+
+  /* ---------- cabeçalho ---------- */
+  header.top{
+    flex:0 0 auto;
+    padding:calc(18px + env(safe-area-inset-top)) 24px 18px;
+    background:var(--bg);
+  }
+  header.top .date{
+    font-family:var(--serif);
+    font-style:italic;
+    font-size:14.5px;
+    color:var(--ink-soft);
+    letter-spacing:0.01em;
+  }
+  header.top h1{
+    font-family:var(--serif);
+    font-weight:400;
+    font-size:30px;
+    line-height:1.1;
+    margin:6px 0 0;
+    letter-spacing:-0.012em;
+  }
+
+  /* ---------- área rolável ---------- */
+  main{
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-y:contain;
+    padding:4px 24px 32px;
+  }
+  section.view{ display:none; }
+  section.view.active{ display:block; }
+
+  h2.section-title{
+    font-family:var(--serif);
+    font-weight:400;
+    font-size:15px;
+    color:var(--ink-mid);
+    letter-spacing:0.015em;
+    margin:30px 0 12px;
+    padding-bottom:10px;
+    border-bottom:1px solid var(--line);
+  }
+  h2.section-title:first-child{ margin-top:14px; }
+
+  .panel{
+    background:var(--surface);
+    border-radius:18px;
+    padding:20px;
+    margin-bottom:6px;
+  }
+
+  /* ---------- formulário ---------- */
+  .field{ display:block; margin-bottom:18px; }
+  .field:last-of-type{ margin-bottom:0; }
+  .field .label-text{
+    display:block;
+    font-size:13px;
+    color:var(--ink-soft);
+    margin-bottom:8px;
+    letter-spacing:0.012em;
+  }
+
+  input[type=date], input[type=time], input[type=number], input[type=text]{
+    width:100%;
+    font-family:var(--sans);
+    font-size:16.5px;
+    color:var(--ink);
+    background:var(--bg);
+    border:1px solid transparent;
+    border-radius:12px;
+    padding:13px 14px;
+    appearance:none; -webkit-appearance:none;
+    transition:border-color .18s var(--ease), background .18s var(--ease);
+  }
+  input::placeholder{ color:var(--ink-soft); opacity:.75; }
+  input:focus{
+    outline:none;
+    background:var(--surface);
+    border-color:var(--accent);
+  }
+
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+
+  /* Contador de doses: círculos finos, toque generoso, número em serifada */
+  .stepper{ display:flex; align-items:center; gap:8px; }
+  .stepper button{
+    width:42px; height:42px; flex:0 0 42px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--ink-mid);
+    font-size:19px; line-height:1;
+    font-family:var(--sans); font-weight:300;
+    transition:background .15s var(--ease), border-color .15s var(--ease);
+  }
+  .stepper button:active{ background:var(--wash); border-color:var(--ink-soft); }
+  .stepper input{
+    text-align:center;
+    font-family:var(--serif);
+    font-size:21px;
+    font-variant-numeric:tabular-nums;
+    padding:11px 4px;
+  }
+
+  button.primary{
+    width:100%;
+    padding:17px;
+    border:none;
+    border-radius:14px;
+    background:var(--ink);
+    color:#F7FAF5;
+    font-size:16.5px;
+    font-family:var(--sans);
+    font-weight:500;
+    letter-spacing:0.008em;
+    margin-top:22px;
+    transition:opacity .15s var(--ease);
+  }
+  button.primary:active{ opacity:.82; }
+
+  button.quiet{
+    width:100%;
+    padding:15px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    background:var(--surface);
+    color:var(--ink-mid);
+    font-family:var(--sans);
+    font-size:15.5px;
+    margin-top:10px;
+    transition:background .15s var(--ease);
+  }
+  button.quiet:active{ background:var(--wash); }
+  button.quiet.danger{ color:var(--warn); border-color:#EADDD6; }
+
+  /* ---------- estoque: o momento de destaque ---------- */
+  .stock-pair{
+    background:var(--surface);
+    border-radius:20px;
+    padding:6px 22px;
+    margin-top:14px;
+  }
+  .stock-row{
+    padding:24px 0;
+    border-bottom:1px solid var(--line-fine);
+  }
+  .stock-row:last-child{ border-bottom:none; }
+  .stock-head{
+    display:flex; align-items:baseline; justify-content:space-between;
+  }
+  .stock-head .name{
+    font-family:var(--serif);
+    font-size:16px;
+    color:var(--ink-mid);
+    letter-spacing:0.01em;
+  }
+  .stock-head .num{
+    font-family:var(--serif);
+    font-size:52px;
+    line-height:1;
+    font-variant-numeric:tabular-nums;
+    letter-spacing:-0.02em;
+  }
+  /* linha que esvazia conforme o consumo desde a última contagem */
+  .gauge{
+    position:relative;
+    height:1.5px;
+    background:var(--line-fine);
+    margin-top:16px;
+    border-radius:2px;
+    overflow:hidden;
+  }
+  .gauge span{
+    position:absolute; inset:0 auto 0 0;
+    background:var(--accent);
+    border-radius:2px;
+    transition:width .5s var(--ease);
+  }
+  .stock-foot{
+    display:flex; justify-content:space-between;
+    margin-top:9px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+  }
+
+  .alert-banner{
+    background:var(--warn-wash);
+    color:var(--warn);
+    border-radius:14px;
+    padding:14px 16px;
+    font-size:14.5px;
+    line-height:1.45;
+    margin-top:14px;
+  }
+  .note{
+    background:var(--wash);
+    color:var(--ink-mid);
+    border-radius:14px;
+    padding:14px 16px;
+    font-size:14.5px;
+    line-height:1.45;
+    margin-top:14px;
+  }
+
+  .stat-line{
+    display:flex; justify-content:space-between; align-items:baseline;
+    padding:13px 0;
+    border-bottom:1px solid var(--line-fine);
+    font-size:15px;
+  }
+  .stat-line:last-child{ border-bottom:none; }
+  .stat-line .k{ color:var(--ink-soft); }
+  .stat-line .v{ font-variant-numeric:tabular-nums; }
+
+  /* ---------- registros ---------- */
+  .record{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    gap:14px;
+    padding:16px 0;
+    border-bottom:1px solid var(--line-fine);
+  }
+  .record:first-child{ padding-top:4px; }
+  .record:last-child{ border-bottom:none; padding-bottom:4px; }
+  .record .when .date{
+    font-size:15.5px;
+    font-variant-numeric:tabular-nums;
+  }
+  .record .when .ctx{
+    display:block; font-size:13.5px; color:var(--ink-soft);
+    margin-top:3px; line-height:1.4;
+  }
+  .record .actions{ display:flex; gap:14px; margin-top:9px; }
+  .record .actions span{
+    font-size:13px; color:var(--ink-soft);
+    border-bottom:1px solid var(--line);
+    padding-bottom:1px;
+  }
+  .record .amounts{
+    text-align:right;
+    font-family:var(--serif);
+    font-size:18px;
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+    line-height:1.5;
+  }
+  .record .amounts .tag{
+    font-family:var(--sans);
+    font-size:11.5px;
+    color:var(--ink-soft);
+    margin-left:5px;
+    letter-spacing:0.02em;
+  }
+
+  .empty{
+    font-family:var(--serif);
+    font-style:italic;
+    color:var(--ink-soft);
+    font-size:15px;
+    padding:6px 0;
+  }
+
+  .hint{
+    font-size:14px; color:var(--ink-soft);
+    line-height:1.5; margin:0 0 18px;
+  }
+
+  /* ---------- toast ---------- */
+  .toast{
+    position:fixed; left:50%; bottom:calc(88px + env(safe-area-inset-bottom));
+    transform:translateX(-50%) translateY(10px);
+    background:var(--ink); color:#F7FAF5;
+    padding:12px 20px; border-radius:26px;
+    font-size:14.5px; white-space:nowrap;
+    opacity:0; pointer-events:none;
+    transition:opacity .28s var(--ease), transform .28s var(--ease);
+    z-index:20;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* ---------- navegação ---------- */
+  nav.tabs{
+    flex:0 0 auto;
+    display:flex;
+    background:var(--bg);
+    border-top:1px solid var(--line);
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  nav.tabs button{
+    flex:1;
+    background:none; border:none;
+    padding:14px 4px 12px;
+    font-family:var(--sans);
+    font-size:12.5px;
+    color:var(--ink-soft);
+    letter-spacing:0.015em;
+    transition:color .2s var(--ease);
+  }
+  nav.tabs button .mark{
+    display:block;
+    width:16px; height:1.5px;
+    background:transparent;
+    margin:0 auto 8px;
+    border-radius:2px;
+    transition:background .2s var(--ease), width .25s var(--ease);
+  }
+  nav.tabs button.active{ color:var(--ink); }
+  nav.tabs button.active .mark{ background:var(--accent); width:22px; }
+
+  input[type=file]{ display:none; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+<header class="top">
+  <div class="date" id="today-label">hoje</div>
+  <h1>Caderno</h1>
+</header>
+
+<main>
+
+  <!-- REGISTRO -->
+  <section class="view active" id="view-registro">
+    <h2 class="section-title">Novo registro</h2>
+    <div class="panel">
+      <label class="field">
+        <span class="label-text">Data</span>
+        <input type="date" id="f-date">
+      </label>
+
+      <div class="row2">
+        <label class="field">
+          <span class="label-text">D8</span>
+          <div class="stepper">
+            <button type="button" data-step="-0.5" data-target="f-d8" aria-label="diminuir D8">−</button>
+            <input type="number" id="f-d8" inputmode="decimal" step="0.5" min="0" value="0">
+            <button type="button" data-step="0.5" data-target="f-d8" aria-label="aumentar D8">+</button>
+          </div>
+        </label>
+        <label class="field">
+          <span class="label-text">D9</span>
+          <div class="stepper">
+            <button type="button" data-step="-0.5" data-target="f-d9" aria-label="diminuir D9">−</button>
+            <input type="number" id="f-d9" inputmode="decimal" step="0.5" min="0" value="0">
+            <button type="button" data-step="0.5" data-target="f-d9" aria-label="aumentar D9">+</button>
+          </div>
+        </label>
+      </div>
+
+      <label class="field">
+        <span class="label-text">Horário</span>
+        <input type="time" id="f-time">
+      </label>
+
+      <label class="field">
+        <span class="label-text">Contexto</span>
+        <input type="text" id="f-ctx" placeholder="show, recovery, sexta sem substância">
+      </label>
+
+      <button class="primary" id="btn-save">Salvar registro</button>
+      <button class="quiet" id="btn-cancel-edit" style="display:none;">Cancelar edição</button>
+    </div>
+
+    <h2 class="section-title">Últimos registros</h2>
+    <div class="panel" id="recent-list">
+      <div class="empty">Nada registrado ainda.</div>
+    </div>
+  </section>
+
+  <!-- ESTOQUE -->
+  <section class="view" id="view-estoque">
+    <h2 class="section-title">Estoque</h2>
+
+    <div class="stock-pair">
+      <div class="stock-row">
+        <div class="stock-head">
+          <span class="name">D8</span>
+          <span class="num" id="stock-d8">—</span>
+        </div>
+        <div class="gauge"><span id="gauge-d8" style="width:0%"></span></div>
+        <div class="stock-foot">
+          <span id="foot-d8-left">—</span>
+          <span id="foot-d8-rate"></span>
+        </div>
+      </div>
+      <div class="stock-row">
+        <div class="stock-head">
+          <span class="name">D9</span>
+          <span class="num" id="stock-d9">—</span>
+        </div>
+        <div class="gauge"><span id="gauge-d9" style="width:0%"></span></div>
+        <div class="stock-foot">
+          <span id="foot-d9-left">—</span>
+          <span id="foot-d9-rate"></span>
+        </div>
+      </div>
+    </div>
+
+    <div id="stock-alert"></div>
+
+    <h2 class="section-title">Consumo</h2>
+    <div class="panel">
+      <div class="stat-line"><span class="k">Média semanal · D8</span><span class="v" id="avg-d8">—</span></div>
+      <div class="stat-line"><span class="k">Média semanal · D9</span><span class="v" id="avg-d9">—</span></div>
+      <div class="stat-line"><span class="k">Última contagem</span><span class="v" id="last-count">—</span></div>
+    </div>
+
+    <h2 class="section-title">Recontagem</h2>
+    <div class="panel">
+      <p class="hint">Use quando chegar um pedido novo ou para corrigir uma divergência. A contagem informada aqui vira o novo ponto de partida.</p>
+      <div class="row2">
+        <label class="field">
+          <span class="label-text">D8 real</span>
+          <input type="number" id="rc-d8" inputmode="decimal" step="0.5" min="0">
+        </label>
+        <label class="field">
+          <span class="label-text">D9 real</span>
+          <input type="number" id="rc-d9" inputmode="decimal" step="0.5" min="0">
+        </label>
+      </div>
+      <label class="field">
+        <span class="label-text">Data da contagem</span>
+        <input type="date" id="rc-date">
+      </label>
+      <button class="primary" id="btn-recount">Registrar contagem</button>
+    </div>
+  </section>
+
+  <!-- AJUSTES -->
+  <section class="view" id="view-config">
+    <h2 class="section-title">Ajuste de estoque</h2>
+    <div class="panel">
+      <p class="hint">Mesmo efeito de uma recontagem, com a data de hoje.</p>
+      <div class="row2">
+        <label class="field">
+          <span class="label-text">D8</span>
+          <input type="number" id="cfg-d8" inputmode="decimal" step="0.5" min="0">
+        </label>
+        <label class="field">
+          <span class="label-text">D9</span>
+          <input type="number" id="cfg-d9" inputmode="decimal" step="0.5" min="0">
+        </label>
+      </div>
+      <button class="primary" id="btn-cfg-save">Salvar ajuste</button>
+    </div>
+
+    <h2 class="section-title">Seus dados</h2>
+    <div class="panel">
+      <p class="hint">Tudo fica guardado só neste aparelho. Exporte de vez em quando para ter uma cópia nos Arquivos ou no iCloud.</p>
+      <button class="quiet" id="btn-export-csv">Exportar CSV</button>
+      <button class="quiet" id="btn-export-json">Exportar backup completo</button>
+      <button class="quiet" id="btn-import-json">Importar backup</button>
+      <input type="file" id="file-import" accept="application/json">
+    </div>
+
+    <h2 class="section-title">Recomeçar</h2>
+    <div class="panel">
+      <p class="hint">Apaga registros e contagens deste aparelho. Não tem como desfazer.</p>
+      <button class="quiet danger" id="btn-reset">Apagar todos os dados</button>
+    </div>
+  </section>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<nav class="tabs">
+  <button data-view="registro" class="active"><span class="mark"></span>Registro</button>
+  <button data-view="estoque"><span class="mark"></span>Estoque</button>
+  <button data-view="config"><span class="mark"></span>Ajustes</button>
+</nav>
+
+</div><!-- /#app -->
+
+<script>
+(function(){
+  "use strict";
+
+  /* Chaves mantidas idênticas à versão anterior para não perder nada já registrado. */
+  var STORE_KEY = "dlcnh_records_v1";
+  var STOCK_EVENTS_KEY = "dlcnh_stock_events_v1";
+  var editingId = null;
+
+  // ---------- armazenamento ----------
+  function loadRecords(){
+    try{ return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }catch(e){ return []; }
+  }
+  function saveRecords(list){ localStorage.setItem(STORE_KEY, JSON.stringify(list)); }
+  function loadStockEvents(){
+    try{ return JSON.parse(localStorage.getItem(STOCK_EVENTS_KEY)) || []; }catch(e){ return []; }
+  }
+  function saveStockEvents(list){ localStorage.setItem(STOCK_EVENTS_KEY, JSON.stringify(list)); }
+  function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+  // ---------- datas ----------
+  function todayISO(){
+    var d = new Date();
+    return new Date(d - d.getTimezoneOffset()*60000).toISOString().slice(0,10);
+  }
+  function fmtBR(iso){
+    if(!iso) return "—";
+    var p = iso.split("-");
+    return p[2] + "/" + p[1] + "/" + p[0];
+  }
+  var WEEKDAYS = ["domingo","segunda-feira","terça-feira","quarta-feira","quinta-feira","sexta-feira","sábado"];
+  var MONTHS = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+  function todayLabel(){
+    var d = new Date();
+    return WEEKDAYS[d.getDay()] + ", " + d.getDate() + " de " + MONTHS[d.getMonth()];
+  }
+  function daysBetween(a,b){
+    return Math.round((new Date(b+"T00:00:00") - new Date(a+"T00:00:00")) / 86400000);
+  }
+  function fmtNum(n){
+    n = Math.round(n*100)/100;
+    return (n % 1 === 0) ? String(n) : String(n).replace(".", ",");
+  }
+
+  // ---------- navegação ----------
+  var views = document.querySelectorAll(".view");
+  var tabButtons = document.querySelectorAll("nav.tabs button");
+  var mainEl = document.querySelector("main");
+
+  function goTo(name){
+    tabButtons.forEach(function(b){ b.classList.toggle("active", b.dataset.view === name); });
+    views.forEach(function(v){ v.classList.remove("active"); });
+    document.getElementById("view-" + name).classList.add("active");
+    mainEl.scrollTop = 0;
+    if(name === "estoque") renderStock();
+    if(name === "config") renderConfig();
+  }
+  tabButtons.forEach(function(btn){
+    btn.addEventListener("click", function(){ goTo(btn.dataset.view); });
+  });
+
+  document.getElementById("today-label").textContent = todayLabel();
+
+  // ---------- toast ----------
+  var toastEl = document.getElementById("toast");
+  var toastTimer = null;
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.classList.remove("show"); }, 1800);
+  }
+
+  // ---------- contadores ----------
+  document.querySelectorAll(".stepper button").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var target = document.getElementById(btn.dataset.target);
+      var val = parseFloat(target.value) || 0;
+      target.value = Math.max(0, Math.round((val + parseFloat(btn.dataset.step))*100)/100);
+    });
+  });
+
+  // ---------- formulário ----------
+  var fDate = document.getElementById("f-date");
+  var fD8 = document.getElementById("f-d8");
+  var fD9 = document.getElementById("f-d9");
+  var fTime = document.getElementById("f-time");
+  var fCtx = document.getElementById("f-ctx");
+  var btnSave = document.getElementById("btn-save");
+  var btnCancelEdit = document.getElementById("btn-cancel-edit");
+
+  fDate.value = todayISO();
+
+  function clearAmounts(keepDate){
+    fD8.value = 0; fD9.value = 0; fTime.value = ""; fCtx.value = "";
+    if(!keepDate) fDate.value = todayISO();
+  }
+  function exitEditMode(){
+    editingId = null;
+    btnCancelEdit.style.display = "none";
+    btnSave.textContent = "Salvar registro";
+  }
+
+  btnSave.addEventListener("click", function(){
+    var d8 = parseFloat(fD8.value) || 0;
+    var d9 = parseFloat(fD9.value) || 0;
+    if(!fDate.value){ toast("Escolha uma data"); return; }
+    if(d8 === 0 && d9 === 0){ toast("Registre pelo menos D8 ou D9"); return; }
+
+    var list = loadRecords();
+    if(editingId){
+      var idx = list.findIndex(function(r){ return r.id === editingId; });
+      if(idx > -1){
+        list[idx] = { id:editingId, date:fDate.value, d8:d8, d9:d9, time:fTime.value, ctx:fCtx.value.trim() };
+      }
+      exitEditMode();
+      saveRecords(list);
+      clearAmounts(true);
+      toast("Registro atualizado");
+    } else {
+      list.push({ id:uid(), date:fDate.value, d8:d8, d9:d9, time:fTime.value, ctx:fCtx.value.trim() });
+      saveRecords(list);
+      clearAmounts(true);
+      toast("Registrado");
+    }
+    renderRecent();
+  });
+
+  btnCancelEdit.addEventListener("click", function(){
+    exitEditMode();
+    clearAmounts(false);
+  });
+
+  function escapeHTML(s){
+    var d = document.createElement("div");
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function renderRecent(){
+    var list = loadRecords().slice().sort(function(a,b){
+      var da = a.date + (a.time || "00:00");
+      var db = b.date + (b.time || "00:00");
+      return db < da ? -1 : (db > da ? 1 : 0);
+    });
+    var wrap = document.getElementById("recent-list");
+    if(list.length === 0){
+      wrap.innerHTML = '<div class="empty">Nada registrado ainda.</div>';
+      return;
+    }
+    wrap.innerHTML = "";
+    list.slice(0,12).forEach(function(r){
+      var row = document.createElement("div");
+      row.className = "record";
+
+      var when = document.createElement("div");
+      when.className = "when";
+      when.innerHTML =
+        '<span class="date">' + fmtBR(r.date) + (r.time ? " · " + r.time : "") + '</span>' +
+        (r.ctx ? '<span class="ctx">' + escapeHTML(r.ctx) + '</span>' : "");
+
+      var actions = document.createElement("div");
+      actions.className = "actions";
+      var editLink = document.createElement("span");
+      editLink.textContent = "editar";
+      editLink.addEventListener("click", function(){ startEdit(r); });
+      var delLink = document.createElement("span");
+      delLink.textContent = "excluir";
+      delLink.addEventListener("click", function(){ deleteRecord(r.id); });
+      actions.appendChild(editLink);
+      actions.appendChild(delLink);
+      when.appendChild(actions);
+
+      var amounts = document.createElement("div");
+      amounts.className = "amounts";
+      var parts = [];
+      if(r.d8) parts.push(fmtNum(r.d8) + '<span class="tag">D8</span>');
+      if(r.d9) parts.push(fmtNum(r.d9) + '<span class="tag">D9</span>');
+      amounts.innerHTML = parts.join("<br>");
+
+      row.appendChild(when);
+      row.appendChild(amounts);
+      wrap.appendChild(row);
+    });
+  }
+
+  function startEdit(r){
+    editingId = r.id;
+    fDate.value = r.date;
+    fD8.value = r.d8;
+    fD9.value = r.d9;
+    fTime.value = r.time || "";
+    fCtx.value = r.ctx || "";
+    btnCancelEdit.style.display = "block";
+    btnSave.textContent = "Salvar edição";
+    goTo("registro");
+  }
+
+  function deleteRecord(id){
+    saveRecords(loadRecords().filter(function(r){ return r.id !== id; }));
+    renderRecent();
+    toast("Registro excluído");
+  }
+
+  // ---------- estoque ----------
+  function latestStockEvent(){
+    var events = loadStockEvents();
+    if(events.length === 0) return null;
+    return events.slice().sort(function(a,b){ return a.date < b.date ? 1 : -1; })[0];
+  }
+
+  function computeStock(){
+    var evt = latestStockEvent();
+    if(!evt) return null;
+    var usedD8 = 0, usedD9 = 0;
+    loadRecords().forEach(function(r){
+      if(r.date >= evt.date){ usedD8 += r.d8 || 0; usedD9 += r.d9 || 0; }
+    });
+    return {
+      d8: Math.max(0, Math.round((evt.d8 - usedD8)*100)/100),
+      d9: Math.max(0, Math.round((evt.d9 - usedD9)*100)/100),
+      baseD8: evt.d8,
+      baseD9: evt.d9,
+      since: evt.date
+    };
+  }
+
+  function weeklyAverage(){
+    var list = loadRecords();
+    var evt = latestStockEvent();
+    var today = todayISO();
+    var cutoffISO = new Date(new Date(today) - 28*86400000).toISOString().slice(0,10);
+
+    var earliest = null;
+    list.forEach(function(r){ if(!earliest || r.date < earliest) earliest = r.date; });
+
+    var start = cutoffISO;
+    if(evt && evt.date > cutoffISO) start = evt.date;
+    else if(!evt && earliest && earliest > cutoffISO) start = earliest;
+
+    var sumD8 = 0, sumD9 = 0;
+    list.forEach(function(r){
+      if(r.date >= start && r.date <= today){ sumD8 += r.d8 || 0; sumD9 += r.d9 || 0; }
+    });
+    var weeks = Math.max(1, daysBetween(start, today) + 1) / 7;
+    return { d8: sumD8/weeks, d9: sumD9/weeks };
+  }
+
+  function weeksLeftText(stock, rate){
+    if(rate <= 0) return "sem consumo registrado";
+    var w = stock / rate;
+    if(w < 1) return "menos de 1 semana";
+    return "~" + fmtNum(Math.round(w*10)/10) + " semanas";
+  }
+
+  function renderStock(){
+    var stock = computeStock();
+    var avg = weeklyAverage();
+    var alertBox = document.getElementById("stock-alert");
+    alertBox.innerHTML = "";
+
+    if(!stock){
+      ["stock-d8","stock-d9"].forEach(function(id){ document.getElementById(id).textContent = "—"; });
+      document.getElementById("gauge-d8").style.width = "0%";
+      document.getElementById("gauge-d9").style.width = "0%";
+      document.getElementById("foot-d8-left").textContent = "";
+      document.getElementById("foot-d9-left").textContent = "";
+      document.getElementById("foot-d8-rate").textContent = "";
+      document.getElementById("foot-d9-rate").textContent = "";
+      document.getElementById("avg-d8").textContent = "—";
+      document.getElementById("avg-d9").textContent = "—";
+      document.getElementById("last-count").textContent = "—";
+      alertBox.innerHTML = '<div class="note">Informe sua contagem atual abaixo para começar a acompanhar o estoque.</div>';
+      return;
+    }
+
+    document.getElementById("stock-d8").textContent = fmtNum(stock.d8);
+    document.getElementById("stock-d9").textContent = fmtNum(stock.d9);
+
+    var pct8 = stock.baseD8 > 0 ? (stock.d8/stock.baseD8)*100 : 0;
+    var pct9 = stock.baseD9 > 0 ? (stock.d9/stock.baseD9)*100 : 0;
+    document.getElementById("gauge-d8").style.width = Math.max(0, Math.min(100, pct8)) + "%";
+    document.getElementById("gauge-d9").style.width = Math.max(0, Math.min(100, pct9)) + "%";
+
+    document.getElementById("foot-d8-left").textContent = weeksLeftText(stock.d8, avg.d8);
+    document.getElementById("foot-d9-left").textContent = weeksLeftText(stock.d9, avg.d9);
+    document.getElementById("foot-d8-rate").textContent = avg.d8 > 0 ? fmtNum(avg.d8) + "/semana" : "";
+    document.getElementById("foot-d9-rate").textContent = avg.d9 > 0 ? fmtNum(avg.d9) + "/semana" : "";
+
+    document.getElementById("avg-d8").textContent = fmtNum(avg.d8);
+    document.getElementById("avg-d9").textContent = fmtNum(avg.d9);
+    document.getElementById("last-count").textContent = fmtBR(stock.since);
+
+    var total = stock.d8 + stock.d9;
+    if(total <= 15){
+      alertBox.innerHTML = '<div class="alert-banner">Restam ' + fmtNum(total) +
+        ' no total. É o ponto de fazer o próximo pedido com folga de prazo.</div>';
+    }
+  }
+
+  document.getElementById("rc-date").value = todayISO();
+  document.getElementById("btn-recount").addEventListener("click", function(){
+    var d8 = parseFloat(document.getElementById("rc-d8").value);
+    var d9 = parseFloat(document.getElementById("rc-d9").value);
+    var date = document.getElementById("rc-date").value;
+    if(isNaN(d8) || isNaN(d9) || !date){ toast("Preencha D8, D9 e a data"); return; }
+    var events = loadStockEvents();
+    events.push({ date:date, d8:d8, d9:d9 });
+    saveStockEvents(events);
+    document.getElementById("rc-d8").value = "";
+    document.getElementById("rc-d9").value = "";
+    document.getElementById("rc-date").value = todayISO();
+    renderStock();
+    mainEl.scrollTo({ top:0, behavior:"smooth" });
+    toast("Contagem registrada");
+  });
+
+  // ---------- ajustes ----------
+  function renderConfig(){
+    var stock = computeStock();
+    var evt = latestStockEvent();
+    document.getElementById("cfg-d8").value = stock ? stock.d8 : (evt ? evt.d8 : "");
+    document.getElementById("cfg-d9").value = stock ? stock.d9 : (evt ? evt.d9 : "");
+  }
+
+  document.getElementById("btn-cfg-save").addEventListener("click", function(){
+    var d8 = parseFloat(document.getElementById("cfg-d8").value);
+    var d9 = parseFloat(document.getElementById("cfg-d9").value);
+    if(isNaN(d8) || isNaN(d9)){ toast("Preencha D8 e D9"); return; }
+    var events = loadStockEvents();
+    events.push({ date:todayISO(), d8:d8, d9:d9 });
+    saveStockEvents(events);
+    toast("Estoque ajustado");
+  });
+
+  // ---------- exportação ----------
+  function toCSV(){
+    var rows = [["Data","Horário","D8","D9","Contexto"]];
+    loadRecords().slice().sort(function(a,b){ return a.date < b.date ? -1 : 1; }).forEach(function(r){
+      rows.push([
+        fmtBR(r.date),
+        r.time || "",
+        r.d8 ? String(r.d8).replace(".", ",") : "0",
+        r.d9 ? String(r.d9).replace(".", ",") : "0",
+        (r.ctx || "").replace(/;/g, ",")
+      ]);
+    });
+    return rows.map(function(row){ return row.join(";"); }).join("\r\n");
+  }
+
+  function fallbackDownload(blob, filename){
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+  }
+
+  function shareOrDownload(content, filename, mime){
+    var blob = new Blob([content], { type:mime });
+    if(navigator.canShare && window.File){
+      try{
+        var file = new File([blob], filename, { type:mime });
+        if(navigator.canShare({ files:[file] })){
+          navigator.share({ files:[file], title:filename }).catch(function(){ fallbackDownload(blob, filename); });
+          return;
+        }
+      }catch(e){}
+    }
+    fallbackDownload(blob, filename);
+  }
+
+  document.getElementById("btn-export-csv").addEventListener("click", function(){
+    shareOrDownload("\uFEFF" + toCSV(), "caderno_" + todayISO() + ".csv", "text/csv");
+  });
+
+  document.getElementById("btn-export-json").addEventListener("click", function(){
+    var data = { records:loadRecords(), stockEvents:loadStockEvents(), exportedAt:new Date().toISOString() };
+    shareOrDownload(JSON.stringify(data, null, 2), "caderno_backup_" + todayISO() + ".json", "application/json");
+  });
+
+  document.getElementById("btn-import-json").addEventListener("click", function(){
+    document.getElementById("file-import").click();
+  });
+
+  document.getElementById("file-import").addEventListener("change", function(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      try{
+        var data = JSON.parse(reader.result);
+        if(Array.isArray(data.records)) saveRecords(data.records);
+        if(Array.isArray(data.stockEvents)) saveStockEvents(data.stockEvents);
+        renderRecent(); renderStock(); renderConfig();
+        toast("Backup importado");
+      }catch(err){
+        toast("Esse arquivo não é um backup válido");
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  });
+
+  // ---------- apagar tudo ----------
+  var resetArmed = false, resetTimer = null;
+  var btnReset = document.getElementById("btn-reset");
+  btnReset.addEventListener("click", function(){
+    if(!resetArmed){
+      resetArmed = true;
+      btnReset.textContent = "Toque de novo para confirmar";
+      resetTimer = setTimeout(function(){
+        resetArmed = false;
+        btnReset.textContent = "Apagar todos os dados";
+      }, 3500);
+      return;
+    }
+    clearTimeout(resetTimer);
+    localStorage.removeItem(STORE_KEY);
+    localStorage.removeItem(STOCK_EVENTS_KEY);
+    resetArmed = false;
+    btnReset.textContent = "Apagar todos os dados";
+    renderRecent(); renderStock(); renderConfig();
+    toast("Dados apagados");
+  });
+
+  // ---------- início ----------
+  renderRecent();
+  renderStock();
+})();
+</script>
+</body>
+</html>
