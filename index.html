@@ -610,21 +610,29 @@
     border-top:1px solid var(--sage-200);
     padding-bottom:env(safe-area-inset-bottom);
   }
+  /* cinco abas: compacta só o necessário, mantendo o alvo de toque alto */
   nav.tabs button{
-    flex:1;
+    flex:1 1 0;
+    min-width:0;
     display:flex; flex-direction:column; align-items:center; gap:4px;
     background:none; border:none;
-    padding:9px 4px 8px;
+    padding:9px 2px 8px;
     min-height:52px;
     font-family:var(--sans);
-    font-size:11.5px;
+    font-size:11px;
+    letter-spacing:-0.002em;
+    white-space:nowrap;
     color:var(--sage-600);
     transition:color var(--t);
   }
   nav.tabs button svg{
-    width:23px; height:23px;
+    width:22px; height:22px;
     stroke-width:1.6;
     transition:stroke-width var(--t);
+  }
+  @media (max-width:340px){
+    nav.tabs button{ font-size:10.5px; }
+    nav.tabs button svg{ width:21px; height:21px; }
   }
   nav.tabs button .mark{
     display:block;
@@ -815,9 +823,142 @@
     flex:0 0 auto; font-weight:400; color:var(--sage-600);
   }
 
+  /* ================= RASTREAMENTO ================= */
+  .sr-only{
+    position:absolute; width:1px; height:1px;
+    padding:0; margin:-1px; overflow:hidden;
+    clip:rect(0 0 0 0); white-space:nowrap; border:0;
+  }
+  .courier{
+    font-size:12px; letter-spacing:0.14em; color:var(--sage-600);
+  }
+  .status-card{ margin-top:var(--s-3); }
+  .status-card .lbl{
+    font-size:13px; color:var(--sage-700); margin-bottom:var(--s-2);
+  }
+  .status-card .desc{
+    font-family:var(--serif);
+    font-size:27px; line-height:1.22;
+    letter-spacing:-0.012em;
+    color:var(--ivy-950);
+    overflow-wrap:break-word;
+  }
+  .status-card .when{
+    font-size:14.5px; color:var(--sage-700); margin-top:var(--s-3);
+  }
+  .status-card .extra{
+    font-size:14.5px; color:var(--sage-700); margin-top:var(--s-2); line-height:1.45;
+  }
+
+  #btn-track-refresh[disabled]{ opacity:.6; }
+  .spin{
+    display:inline-block; width:15px; height:15px;
+    margin-right:9px; vertical-align:-2px;
+    border:2px solid rgba(247,248,244,.32);
+    border-top-color:var(--ivory-50);
+    border-radius:50%;
+    animation:spin .7s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .lastcheck{
+    margin-top:var(--s-3); text-align:center;
+    font-size:13.5px; color:var(--sage-700);
+  }
+  .lastcheck:empty{ display:none; }
+  .track-msg{
+    background:var(--field); color:var(--ivy-800);
+    border-radius:var(--radius-sm);
+    padding:var(--s-3) var(--s-4);
+    margin-top:var(--s-4);
+    font-size:14.5px; line-height:1.5;
+  }
+  .track-msg:empty{ display:none; }
+
+  /* timeline */
+  .tl{ position:relative; }
+  .tl-item{
+    position:relative;
+    padding-left:26px;
+    padding-bottom:var(--s-6);
+  }
+  .tl-item:last-child{ padding-bottom:0; }
+  /* linha vertical: só entre os pontos, nunca depois do último */
+  .tl-item:not(:last-child)::before{
+    content:""; position:absolute;
+    left:5px; top:14px; bottom:-2px;
+    width:1px; background:var(--sage-300);
+  }
+  .tl-item::after{
+    content:""; position:absolute;
+    left:0; top:5px;
+    width:11px; height:11px;
+    border-radius:50%;
+    border:1.5px solid var(--sage-500);
+    background:var(--surface);
+    box-sizing:border-box;
+  }
+  .tl-item.now::after{
+    background:var(--ivy-900); border-color:var(--ivy-900);
+  }
+  .tl-item .tag-now{
+    display:inline-block;
+    font-size:11px; letter-spacing:0.12em;
+    color:var(--sage-700);
+    margin-bottom:var(--s-1);
+  }
+  .tl-item .tag-new{
+    display:inline-block;
+    font-size:11px; letter-spacing:0.12em;
+    color:var(--ivy-800);
+    background:var(--sage-200);
+    border-radius:999px;
+    padding:2px 8px;
+    margin-left:6px;
+  }
+  .tl-item .d{
+    font-size:15.5px; line-height:1.45; color:var(--sage-700);
+    overflow-wrap:break-word;
+  }
+  .tl-item.now .d{
+    font-size:16.5px; color:var(--ivy-950);
+  }
+  .tl-item .meta{
+    font-size:14px; color:var(--sage-700); margin-top:var(--s-1);
+    overflow-wrap:break-word;
+  }
+  .tl-item .stamp{
+    font-size:13.5px; color:var(--sage-600); margin-top:var(--s-1);
+    font-variant-numeric:tabular-nums;
+  }
+  .fadein{ animation:fadein .2s var(--ease); }
+  @keyframes fadein{ from{ opacity:0; } to{ opacity:1; } }
+
+  /* código em Ajustes */
+  .code-row{ display:flex; gap:var(--s-2); }
+  .code-row input{ flex:1 1 auto; min-width:0; }
+  .code-row button{
+    flex:0 0 auto;
+    min-height:48px; padding:0 20px;
+    border:none; border-radius:var(--radius-sm);
+    background:var(--ivy-900); color:var(--ivory-50);
+    font-family:var(--sans); font-size:16px; font-weight:500;
+    transition:background var(--t), transform var(--t);
+  }
+  .code-row button:active{ background:var(--ivy-950); transform:scale(.97); }
+  .code-row input{ text-transform:uppercase; letter-spacing:0.04em; }
+  /* o uppercase vale para o valor digitado, nunca para o placeholder */
+  .code-row input::placeholder{ text-transform:none; letter-spacing:0; }
+  .code-row input::-webkit-input-placeholder{ text-transform:none; letter-spacing:0; }
+  @media (max-width:340px){
+    .code-row{ flex-direction:column; }
+    .code-row button{ padding:14px 20px; }
+  }
+
   @media (prefers-reduced-motion: reduce){
     *{ transition:none !important; }
     section.view.active{ animation:none; }
+    .spin{ animation-duration:1.6s; }
+    .fadein{ animation:none; }
   }
 </style>
 </head>
@@ -1011,6 +1152,12 @@
     <div id="pat-body"></div>
   </section>
 
+  <!-- RASTREIO -->
+  <section class="view" id="view-rastreio">
+    <div id="track-body"></div>
+    <div class="sr-only" id="track-live" role="status" aria-live="polite"></div>
+  </section>
+
   <!-- AJUSTES -->
   <section class="view" id="view-config">
     <h2 class="section-title">Dados</h2>
@@ -1038,9 +1185,21 @@
       <div class="tag-list" id="tag-list"></div>
     </div>
 
+    <h2 class="section-title" id="sec-rastreamento">Rastreamento</h2>
+    <div class="panel">
+      <p class="hint">Código da Memphis Courier. Fica guardado só neste aparelho e é enviado apenas quando você toca em atualizar na aba Rastreio.</p>
+      <div class="code-row">
+        <input type="text" id="track-code-input" placeholder="Código de rastreamento"
+               inputmode="text" maxlength="40"
+               autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
+        <button type="button" id="btn-track-save">Salvar</button>
+      </div>
+      <button class="quiet danger" id="btn-track-remove" style="display:none;">Remover código</button>
+    </div>
+
     <h2 class="section-title">Zona de risco</h2>
     <div class="panel">
-      <p class="hint">Apaga todos os registros e contagens deste aparelho. Esta ação não pode ser desfeita.</p>
+      <p class="hint">Apaga todos os registros, contagens e dados de rastreamento deste aparelho. Esta ação não pode ser desfeita.</p>
       <button class="quiet danger" id="btn-reset">Apagar todos os dados</button>
     </div>
   </section>
@@ -1061,6 +1220,10 @@
   <button data-view="padroes" aria-label="Padrões">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V12M12 20V5M19 20v-5"/></svg>
     <span class="mark"></span>Padrões
+  </button>
+  <button data-view="rastreio" aria-label="Rastreio">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9.5h14v10H5z"/><path d="M5 9.5 7.2 4.5h9.6L19 9.5"/><path d="M12 9.5v10"/></svg>
+    <span class="mark"></span>Rastreio
   </button>
   <button data-view="config" aria-label="Ajustes">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2.2"/><circle cx="10" cy="17" r="2.2"/></svg>
@@ -1153,7 +1316,7 @@
   var tabButtons = document.querySelectorAll("nav.tabs button");
   var mainEl = document.querySelector("main");
   var screenTitle = document.getElementById("screen-title");
-  var TITLES = { registro:"Registro", estoque:"Estoque", padroes:"Padrões", config:"Ajustes" };
+  var TITLES = { registro:"Registro", estoque:"Estoque", padroes:"Padrões", rastreio:"Rastreamento", config:"Ajustes" };
 
   function goTo(name){
     tabButtons.forEach(function(b){ b.classList.toggle("active", b.dataset.view === name); });
@@ -1163,7 +1326,8 @@
     mainEl.scrollTop = 0;
     if(name === "estoque"){ renderStock(); renderConfig(); }
     if(name === "padroes") renderPatterns();
-    if(name === "config"){ renderMeta(); renderTagList(); }
+    if(name === "rastreio") renderTracking();
+    if(name === "config"){ renderMeta(); renderTagList(); renderTrackingSettings(); }
   }
   tabButtons.forEach(function(btn){
     btn.addEventListener("click", function(){ goTo(btn.dataset.view); });
@@ -2145,6 +2309,403 @@
     });
   });
 
+
+  /* ================= RASTREAMENTO =================
+     O app fala apenas com o Worker; nunca com a API da Memphis diretamente.
+     Todo texto vindo da API entra no DOM por textContent, nunca por innerHTML. */
+
+  var TRACKING_WORKER_URL = "https://dlcnh-tracker.2yry8gtjmh.workers.dev";
+  /* Chaves próprias, no mesmo padrão das existentes. Não tocam em registros,
+     estoque nem tags. */
+  var TRACK_CODE_KEY  = "dlcnh_tracking_code_v1";
+  var TRACK_CACHE_KEY = "dlcnh_tracking_cache_v1";
+
+  var trackBusy = false;
+  var trackError = null;      // {kind:"network"|"timeout"|"notfound"} — só da sessão
+  var trackNewKeys = {};      // eventos novos desta atualização — não persistido
+
+  // ---------- armazenamento ----------
+  function getTrackingCode(){
+    try{ return localStorage.getItem(TRACK_CODE_KEY) || ""; }catch(e){ return ""; }
+  }
+  function saveTrackingCode(code){
+    try{ localStorage.setItem(TRACK_CODE_KEY, code); }catch(e){}
+  }
+  function clearTrackingCode(){
+    try{ localStorage.removeItem(TRACK_CODE_KEY); }catch(e){}
+  }
+  function getTrackingCache(){
+    try{
+      var c = JSON.parse(localStorage.getItem(TRACK_CACHE_KEY));
+      if(!c || !Array.isArray(c.events)) return null;
+      return c;
+    }catch(e){ return null; }
+  }
+  function saveTrackingCache(events, code){
+    try{
+      localStorage.setItem(TRACK_CACHE_KEY, JSON.stringify({
+        events: events, lastCheck: new Date().toISOString(), code: code
+      }));
+    }catch(e){}
+  }
+  function clearTrackingCache(){
+    try{ localStorage.removeItem(TRACK_CACHE_KEY); }catch(e){}
+    trackNewKeys = {};
+    trackError = null;
+  }
+
+  // ---------- datas dos eventos ----------
+  /* Os carimbos da Memphis vêm sem fuso ("2026-09-16T06:38:56").
+     Parseamos os componentes na mão: nenhum objeto Date participa, então
+     06:38 nunca vira 03:38 por conversão de UTC. */
+  function parseEventStamp(raw){
+    if(typeof raw !== "string") return null;
+    var m = raw.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?/);
+    if(!m) return null;
+    return {
+      date: m[1] + "-" + m[2] + "-" + m[3],
+      hm: m[4] + ":" + m[5],
+      year: parseInt(m[1],10),
+      sort: parseInt(m[1]+m[2]+m[3]+m[4]+m[5]+(m[6]||"00"), 10)
+    };
+  }
+  function formatEventStamp(p){
+    if(!p) return "";
+    var diff = daysBetween(p.date, todayISO());
+    if(diff === 0) return "Hoje · " + p.hm;
+    if(diff === 1) return "Ontem · " + p.hm;
+    var base = fmtShort(p.date);
+    if(p.year !== parseInt(todayISO().slice(0,4), 10)) base += " " + p.year;
+    return base + " · " + p.hm;
+  }
+  /* Horário da consulta feita pelo app — este é um instante real, então o
+     Date local é o correto aqui. Não confundir com a data do evento. */
+  function formatCheckClock(iso){
+    var d = new Date(iso);
+    if(isNaN(d.getTime())) return "";
+    return ("0"+d.getHours()).slice(-2) + ":" + ("0"+d.getMinutes()).slice(-2);
+  }
+
+  // ---------- normalização ----------
+  function parseTrackingEvents(list){
+    if(!Array.isArray(list)) return [];
+    var out = [];
+    list.forEach(function(e){
+      if(!e || typeof e !== "object") return;
+      var desc = typeof e.descricao === "string" ? e.descricao.trim() : "";
+      if(!desc) return;                       // sem descrição não há o que mostrar
+      out.push({
+        key: String(e.codigo == null ? "" : e.codigo) + "|" + String(e.data == null ? "" : e.data),
+        desc: desc,
+        local: typeof e.local === "string" ? e.local.trim() : "",
+        comentario: typeof e.comentario === "string" ? e.comentario.trim() : "",
+        stamp: parseEventStamp(e.data)
+      });
+    });
+    return sortTrackingEvents(out);
+  }
+  /* Nunca confiar na ordem recebida: ordenar sempre, do mais recente ao mais antigo. */
+  function sortTrackingEvents(events){
+    return events.slice().sort(function(a,b){
+      var as = a.stamp ? a.stamp.sort : -1;
+      var bs = b.stamp ? b.stamp.sort : -1;
+      return bs - as;
+    });
+  }
+
+  // ---------- consulta ----------
+  function fetchTracking(code){
+    return new Promise(function(resolve, reject){
+      var ctrl = null, timer = null, done = false;
+      try{ ctrl = new AbortController(); }catch(e){ ctrl = null; }
+
+      timer = setTimeout(function(){
+        if(done) return;
+        done = true;
+        if(ctrl){ try{ ctrl.abort(); }catch(e){} }
+        reject({ kind:"timeout" });
+      }, 12000);
+
+      var opts = { cache:"no-store" };
+      if(ctrl) opts.signal = ctrl.signal;
+
+      fetch(TRACKING_WORKER_URL + "/?code=" + encodeURIComponent(code), opts)
+        .then(function(r){
+          if(!r.ok) throw new Error("http " + r.status);
+          return r.json();
+        })
+        .then(function(data){
+          if(done) return;
+          done = true; clearTimeout(timer);
+          if(!data || data.success !== true || !Array.isArray(data.items) ||
+             !data.items[0] || !Array.isArray(data.items[0].eventos)){
+            reject({ kind:"notfound" });
+            return;
+          }
+          resolve(parseTrackingEvents(data.items[0].eventos));
+        })
+        .catch(function(){
+          if(done) return;
+          done = true; clearTimeout(timer);
+          reject({ kind:"network" });
+        });
+    });
+  }
+
+  // ---------- helpers de DOM ----------
+  function tEl(tag, cls, text){
+    var n = document.createElement(tag);
+    if(cls) n.className = cls;
+    if(text != null) n.textContent = text;   // dados externos entram só por aqui
+    return n;
+  }
+  function trackPanel(){ return tEl("div","panel"); }
+  function trackTitle(t){ return tEl("h2","section-title", t); }
+
+  function refreshLabel(){
+    return getTrackingCache() ? "Atualizar rastreamento" : "Consultar rastreamento";
+  }
+  function makeRefreshButton(){
+    var b = tEl("button","primary", refreshLabel());
+    b.type = "button";
+    b.id = "btn-track-refresh";
+    b.addEventListener("click", doTrackingRefresh);
+    return b;
+  }
+  function announce(msg){
+    var live = document.getElementById("track-live");
+    if(live) live.textContent = msg;
+  }
+
+  // ---------- estados ----------
+  function buildNoCode(){
+    var p = trackPanel();
+    var ed = tEl("div","editorial","Nenhuma encomenda configurada");
+    ed.appendChild(tEl("small", null,
+      "Adicione seu código da Memphis Courier em Ajustes para acompanhar as etapas por aqui."));
+    p.appendChild(ed);
+    var b = tEl("button","primary","Configurar em Ajustes");
+    b.type = "button";
+    b.addEventListener("click", openTrackingSettings);
+    p.appendChild(b);
+    return p;
+  }
+
+  function buildReady(){
+    var p = trackPanel();
+    var ed = tEl("div","editorial","Rastreamento pronto");
+    ed.appendChild(tEl("small", null,
+      "Toque abaixo para consultar o andamento da sua encomenda."));
+    p.appendChild(ed);
+    p.appendChild(makeRefreshButton());
+    if(trackError) p.appendChild(buildErrorMsg());
+    return p;
+  }
+
+  function buildErrorMsg(){
+    var txt;
+    if(trackError.kind === "timeout"){
+      txt = "A consulta está demorando mais que o esperado. Tente novamente.";
+    } else if(trackError.kind === "notfound"){
+      txt = "Encomenda não encontrada. Confira o código salvo em Ajustes e tente novamente.";
+    } else {
+      txt = getTrackingCache()
+        ? "Não foi possível atualizar agora. Exibindo a última consulta salva."
+        : "Não foi possível consultar agora. Verifique sua conexão e tente novamente.";
+    }
+    var box = tEl("div","track-msg", txt);
+    if(trackError.kind === "notfound"){
+      var edit = tEl("button","quiet","Editar código em Ajustes");
+      edit.type = "button";
+      edit.addEventListener("click", openTrackingSettings);
+      box.appendChild(edit);
+    }
+    return box;
+  }
+
+  function buildStatusCard(events){
+    var p = trackPanel();
+    p.className = "panel status-card";
+    if(events.length === 0){
+      p.appendChild(tEl("div","editorial","Ainda não há etapas disponíveis para esta encomenda."));
+      return p;
+    }
+    var latest = events[0];
+    p.appendChild(tEl("div","lbl","Status atual"));
+    p.appendChild(tEl("div","desc", latest.desc));
+    var extra = [latest.local, latest.comentario].filter(function(x){ return x; });
+    if(extra.length) p.appendChild(tEl("div","extra", extra.join(" · ")));
+    if(latest.stamp) p.appendChild(tEl("div","when", formatEventStamp(latest.stamp)));
+    return p;
+  }
+
+  function buildTimeline(events){
+    var wrap = tEl("div","panel");
+    var tl = tEl("div","tl");
+    tl.setAttribute("role","list");
+    events.forEach(function(ev, i){
+      var item = tEl("div","tl-item" + (i === 0 ? " now" : ""));
+      item.setAttribute("role","listitem");
+      if(trackNewKeys[ev.key]) item.className += " fadein";
+
+      if(i === 0){
+        var head = tEl("div");
+        head.appendChild(tEl("span","tag-now","ATUAL"));
+        if(trackNewKeys[ev.key]) head.appendChild(tEl("span","tag-new","Novo"));
+        item.appendChild(head);
+      } else if(trackNewKeys[ev.key]){
+        var h2 = tEl("div");
+        h2.appendChild(tEl("span","tag-new","Novo"));
+        item.appendChild(h2);
+      }
+
+      item.appendChild(tEl("div","d", ev.desc));
+      /* local e comentário só aparecem quando vierem realmente preenchidos */
+      var meta = [ev.local, ev.comentario].filter(function(x){ return x; });
+      if(meta.length) item.appendChild(tEl("div","meta", meta.join(" · ")));
+      if(ev.stamp) item.appendChild(tEl("div","stamp", formatEventStamp(ev.stamp)));
+      tl.appendChild(item);
+    });
+    wrap.appendChild(tl);
+    return wrap;
+  }
+
+  // ---------- render principal ----------
+  function renderTracking(){
+    var body = document.getElementById("track-body");
+    if(!body) return;
+    body.innerHTML = "";
+
+    var code = getTrackingCode();
+    if(!code){ body.appendChild(buildNoCode()); return; }
+
+    body.appendChild(tEl("div","courier","MEMPHIS COURIER"));
+
+    var cache = getTrackingCache();
+    if(!cache){ body.appendChild(buildReady()); return; }
+
+    var events = Array.isArray(cache.events) ? cache.events : [];
+    body.appendChild(buildStatusCard(events));
+    body.appendChild(makeRefreshButton());
+
+    if(cache.lastCheck){
+      var clock = formatCheckClock(cache.lastCheck);
+      if(clock) body.appendChild(tEl("div","lastcheck","Última consulta · " + clock));
+    }
+    if(trackError) body.appendChild(buildErrorMsg());
+
+    if(events.length){
+      body.appendChild(trackTitle("Histórico"));
+      body.appendChild(buildTimeline(events));
+    }
+  }
+
+  function setRefreshBusy(busy){
+    var b = document.getElementById("btn-track-refresh");
+    if(!b) return;
+    b.disabled = busy;
+    while(b.firstChild) b.removeChild(b.firstChild);
+    if(busy){
+      var s = tEl("span","spin");
+      s.setAttribute("aria-hidden","true");
+      b.appendChild(s);
+      b.appendChild(document.createTextNode("Atualizando…"));
+    } else {
+      b.appendChild(document.createTextNode(refreshLabel()));
+    }
+  }
+
+  function doTrackingRefresh(){
+    if(trackBusy) return;
+    var code = getTrackingCode();
+    if(!code) return;
+    trackBusy = true;
+    trackError = null;
+    setRefreshBusy(true);
+    announce("Atualizando rastreamento");
+
+    fetchTracking(code).then(function(events){
+      var prev = getTrackingCache();
+      trackNewKeys = {};
+      if(prev && Array.isArray(prev.events) && prev.events.length){
+        var seen = {};
+        prev.events.forEach(function(e){ seen[e.key] = true; });
+        events.forEach(function(e){ if(!seen[e.key]) trackNewKeys[e.key] = true; });
+      }
+      saveTrackingCache(events, code);
+      trackBusy = false;
+      renderTracking();
+      announce(events.length
+        ? "Rastreamento atualizado. Status atual: " + events[0].desc
+        : "Ainda não há etapas disponíveis para esta encomenda.");
+    }).catch(function(err){
+      trackBusy = false;
+      trackError = err && err.kind ? err : { kind:"network" };
+      renderTracking();
+      announce(trackError.kind === "notfound"
+        ? "Encomenda não encontrada."
+        : "Não foi possível atualizar o rastreamento.");
+    });
+  }
+
+  function openTrackingSettings(){
+    goTo("config");
+    setTimeout(function(){
+      var sec = document.getElementById("sec-rastreamento");
+      if(sec && sec.scrollIntoView) sec.scrollIntoView({ behavior:"smooth", block:"start" });
+      var inp = document.getElementById("track-code-input");
+      if(inp) inp.focus({ preventScroll:true });
+    }, 80);
+  }
+
+  // ---------- configuração em Ajustes ----------
+  var trackCodeInput = document.getElementById("track-code-input");
+  var btnTrackRemove = document.getElementById("btn-track-remove");
+
+  function renderTrackingSettings(){
+    var code = getTrackingCode();
+    trackCodeInput.value = code;
+    btnTrackRemove.style.display = code ? "block" : "none";
+    resetRemoveArm();
+  }
+
+  document.getElementById("btn-track-save").addEventListener("click", function(){
+    var val = trackCodeInput.value.trim().toUpperCase();
+    if(!val){ toast("Informe o código"); return; }
+    if(val.length < 5){ toast("Código muito curto"); return; }
+
+    var previous = getTrackingCode();
+    saveTrackingCode(val);
+    /* Trocou o código: o histórico da encomenda anterior não pode continuar
+       aparecendo como se fosse da nova. Limpa só o rastreamento. */
+    if(previous && previous !== val) clearTrackingCache();
+    trackCodeInput.value = val;
+    renderTrackingSettings();
+    renderTracking();
+    toast("Código salvo");
+  });
+
+  var removeArmed = false, removeTimer = null;
+  function resetRemoveArm(){
+    removeArmed = false;
+    clearTimeout(removeTimer);
+    btnTrackRemove.textContent = "Remover código";
+  }
+  btnTrackRemove.addEventListener("click", function(){
+    if(!removeArmed){
+      removeArmed = true;
+      btnTrackRemove.textContent = "Toque de novo para remover";
+      removeTimer = setTimeout(resetRemoveArm, 3500);
+      return;
+    }
+    clearTimeout(removeTimer);
+    clearTrackingCode();
+    clearTrackingCache();
+    renderTrackingSettings();
+    renderTracking();
+    toast("Código removido");
+  });
+
   // ---------- exportação ----------
   function toCSV(){
     var rows = [["Data","Horário","D8","D9","Tags","Contexto"]];
@@ -2188,7 +2749,8 @@
   });
 
   document.getElementById("btn-export-json").addEventListener("click", function(){
-    var data = { records:loadRecords(), stockEvents:loadStockEvents(), tags:loadTags(), exportedAt:new Date().toISOString() };
+    var data = { records:loadRecords(), stockEvents:loadStockEvents(), tags:loadTags(),
+                 trackingCode:getTrackingCode(), exportedAt:new Date().toISOString() };
     shareOrDownload(JSON.stringify(data, null, 2), "dlcnh_backup_" + todayISO() + ".json", "application/json");
   });
 
@@ -2206,8 +2768,12 @@
         if(Array.isArray(data.records)) saveRecords(data.records);
         if(Array.isArray(data.stockEvents)) saveStockEvents(data.stockEvents);
         if(Array.isArray(data.tags)) saveTags(data.tags);
+        if(typeof data.trackingCode === "string" && data.trackingCode){
+          if(data.trackingCode !== getTrackingCode()){ saveTrackingCode(data.trackingCode); clearTrackingCache(); }
+        }
         renderRecent(); renderStock(); renderConfig(); renderMeta();
         renderChips(); renderTagList(); renderPatterns();
+        renderTracking(); renderTrackingSettings();
         toast("Backup importado");
       }catch(err){
         toast("Esse arquivo não é um backup válido");
@@ -2234,10 +2800,13 @@
     localStorage.removeItem(STORE_KEY);
     localStorage.removeItem(STOCK_EVENTS_KEY);
     localStorage.removeItem(TAGS_KEY);
+    clearTrackingCode();
+    clearTrackingCache();
     resetArmed = false;
     btnReset.textContent = "Apagar todos os dados";
     renderRecent(); renderStock(); renderConfig(); renderMeta();
     renderChips(); renderTagList(); renderPatterns();
+    renderTracking(); renderTrackingSettings();
     toast("Dados apagados");
   });
 
@@ -2249,6 +2818,8 @@
   renderChips();
   renderTagList();
   renderPatterns();
+  renderTrackingSettings();
+  renderTracking();
 })();
 </script>
 
