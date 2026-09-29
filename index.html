@@ -834,6 +834,88 @@
     flex:0 0 auto; font-weight:400; color:var(--sage-600);
   }
 
+  /* O bloco de Tags é uma <div> e o de Contexto um <label>: a regra
+     .field:last-of-type zerava a margem da div e colava os dois. */
+  .field.tags-field{ margin-bottom:var(--s-5); }
+
+  /* ================= HISTÓRICO ================= */
+  /* Seletor de sub-página: estilo aba sublinhada, deliberadamente diferente
+     das pílulas de filtro do Padrões — é navegação, não filtro. */
+  .subnav{
+    display:flex; gap:var(--s-6);
+    border-bottom:1px solid var(--sage-200);
+    margin:var(--s-2) 0 var(--s-6);
+  }
+  .subnav button{
+    background:none; border:none;
+    padding:var(--s-3) 0;          /* alvo de toque de 48px, acima dos 44 */
+    margin-bottom:-1px;
+    font-family:var(--serif);
+    font-size:19px;
+    color:var(--sage-600);
+    border-bottom:2px solid transparent;
+    transition:color var(--t), border-color var(--t);
+  }
+  .subnav button[aria-selected="true"]{
+    color:var(--ivy-950);
+    border-bottom-color:var(--ivy-900);
+  }
+  .subnav button:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(120,145,129,.35); }
+
+  .subview{ display:none; }
+  .subview.active{ display:block; animation:viewIn .18s var(--ease); }
+
+  .filterbox select{
+    width:100%;
+    font-family:var(--sans); font-size:17px;
+    color:var(--ivy-950); background:var(--field);
+    border:1px solid transparent; border-radius:var(--radius-sm);
+    padding:14px 34px 14px 14px; min-height:48px;
+    appearance:none; -webkit-appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7' fill='none' stroke='%235E7768' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1l4.5 4.5L10 1'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 14px center;
+  }
+  .filterbox select:focus-visible{
+    outline:none; background-color:var(--surface);
+    border-color:var(--sage-500); box-shadow:0 0 0 3px rgba(120,145,129,.24);
+  }
+  .filterbox .chips{ margin-top:0; }
+  /* itens de grid têm min-width:auto e o campo de data tem largura intrínseca
+     grande — sem isto ele espreme a coluna do mês */
+  .filterbox .row2 > .field{ min-width:0; }
+  .filterbox .row2 input, .filterbox select{ min-width:0; }
+
+  .listmeta{
+    font-size:13.5px; color:var(--sage-700);
+    margin:var(--s-5) 0 var(--s-3);
+  }
+  .listmeta:empty{ display:none; }
+
+  /* cabeçalho de dia dentro da lista */
+  .daygroup + .daygroup{ margin-top:var(--s-5); }
+  .dayhead{
+    display:flex; justify-content:space-between; align-items:baseline;
+    gap:var(--s-3);
+    padding:0 var(--s-1) var(--s-2);
+    font-size:13px; letter-spacing:0.06em; color:var(--sage-700);
+  }
+  .dayhead .dsum{ color:var(--sage-600); font-variant-numeric:tabular-nums; }
+
+  #btn-list-more{ margin-top:var(--s-4); }
+
+  /* atalho discreto no fim do formulário */
+  .golink{
+    display:flex; align-items:center; justify-content:center; gap:var(--s-2);
+    width:100%; min-height:48px;
+    margin-top:var(--s-5);
+    background:none; border:none;
+    font-family:var(--sans); font-size:15.5px;
+    color:var(--sage-700);
+    transition:color var(--t);
+  }
+  .golink:active{ color:var(--ivy-900); }
+  .golink:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(120,145,129,.35); border-radius:12px; }
+
   /* ================= RASTREAMENTO ================= */
   .sr-only{
     position:absolute; width:1px; height:1px;
@@ -1130,7 +1212,7 @@
         <input type="time" id="f-time">
       </label>
 
-      <div class="field">
+      <div class="field tags-field">
         <span class="label-text">Tags</span>
         <div class="chips" id="ctx-chips"></div>
       </div>
@@ -1144,10 +1226,10 @@
       <button class="quiet" id="btn-cancel-edit" style="display:none;">Cancelar edição</button>
     </div>
 
-    <h2 class="section-title">Últimos registros</h2>
-    <div class="panel" id="recent-list">
-      <div class="empty">Nada registrado ainda.</div>
-    </div>
+    <button type="button" class="golink" id="btn-go-historico">
+      Ver todos os registros
+      <svg width="9" height="15" viewBox="0 0 9 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 1.5 7 7.5l-5.5 6"/></svg>
+    </button>
   </section>
 
   <!-- ESTOQUE -->
@@ -1242,21 +1324,55 @@
     </div>
   </section>
 
-  <!-- PADRÕES -->
-  <section class="view" id="view-padroes">
-    <div class="filters">
-      <div class="segmented" id="seg-period" role="group" aria-label="Período">
-        <button type="button" data-period="30" aria-pressed="true">30 dias</button>
-        <button type="button" data-period="90" aria-pressed="false">90 dias</button>
-        <button type="button" data-period="all" aria-pressed="false">Tudo</button>
-      </div>
-      <div class="segmented" id="seg-subst" role="group" aria-label="Substância">
-        <button type="button" data-subst="d8" aria-pressed="false">D8</button>
-        <button type="button" data-subst="d9" aria-pressed="false">D9</button>
-        <button type="button" data-subst="both" aria-pressed="true">Ambos</button>
-      </div>
+  <!-- HISTÓRICO — lista de registros + Padrões como sub-páginas -->
+  <section class="view" id="view-historico">
+
+    <div class="subnav" role="tablist" aria-label="Seção do histórico">
+      <button type="button" data-sub="lista"   role="tab" aria-selected="true">Registros</button>
+      <button type="button" data-sub="padroes" role="tab" aria-selected="false">Padrões</button>
     </div>
-    <div id="pat-body"></div>
+
+    <!-- sub-página: todos os registros -->
+    <div class="subview active" id="sub-lista">
+      <div class="panel filterbox">
+        <div class="row2">
+          <label class="field">
+            <span class="label-text">Mês</span>
+            <select id="flt-month"><option value="">Todos</option></select>
+          </label>
+          <label class="field">
+            <span class="label-text">Dia</span>
+            <input type="date" id="flt-day">
+          </label>
+        </div>
+        <div class="field" style="margin-top:var(--s-4)">
+          <span class="label-text">Tag</span>
+          <div class="chips" id="flt-tags"></div>
+        </div>
+        <button class="quiet" id="btn-flt-clear" style="display:none;">Limpar filtros</button>
+      </div>
+      <div class="listmeta" id="list-meta"></div>
+      <div id="list-body"></div>
+      <button class="quiet" id="btn-list-more" style="display:none;">Mostrar mais</button>
+    </div>
+
+    <!-- sub-página: Padrões (markup original preservado) -->
+    <div class="subview" id="sub-padroes">
+  <div class="filters">
+        <div class="segmented" id="seg-period" role="group" aria-label="Período">
+          <button type="button" data-period="30" aria-pressed="true">30 dias</button>
+          <button type="button" data-period="90" aria-pressed="false">90 dias</button>
+          <button type="button" data-period="all" aria-pressed="false">Tudo</button>
+        </div>
+        <div class="segmented" id="seg-subst" role="group" aria-label="Substância">
+          <button type="button" data-subst="d8" aria-pressed="false">D8</button>
+          <button type="button" data-subst="d9" aria-pressed="false">D9</button>
+          <button type="button" data-subst="both" aria-pressed="true">Ambos</button>
+        </div>
+      </div>
+      <div id="pat-body"></div>
+    </div>
+
   </section>
 
   <!-- RASTREIO -->
@@ -1324,9 +1440,9 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 3 7.5l9 4.5 9-4.5Z"/><path d="M3 12.5 12 17l9-4.5"/><path d="M3 17 12 21.5 21 17"/></svg>
     <span class="mark"></span>Estoque
   </button>
-  <button data-view="padroes" aria-label="Padrões">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20V12M12 20V5M19 20v-5"/></svg>
-    <span class="mark"></span>Padrões
+  <button data-view="historico" aria-label="Histórico">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3 4.4V9h4.6"/><path d="M12 7.6V12l3.1 1.9"/></svg>
+    <span class="mark"></span>Histórico
   </button>
   <button data-view="rastreio" aria-label="Rastreio">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9.5h14v10H5z"/><path d="M5 9.5 7.2 4.5h9.6L19 9.5"/><path d="M12 9.5v10"/></svg>
@@ -1423,7 +1539,7 @@
   var tabButtons = document.querySelectorAll("nav.tabs button");
   var mainEl = document.querySelector("main");
   var screenTitle = document.getElementById("screen-title");
-  var TITLES = { registro:"Registro", estoque:"Estoque", padroes:"Padrões", rastreio:"Rastreamento", config:"Ajustes" };
+  var TITLES = { registro:"Registro", estoque:"Estoque", historico:"Histórico", rastreio:"Rastreamento", config:"Ajustes" };
 
   function goTo(name){
     tabButtons.forEach(function(b){ b.classList.toggle("active", b.dataset.view === name); });
@@ -1432,7 +1548,7 @@
     screenTitle.textContent = TITLES[name] || "";
     mainEl.scrollTop = 0;
     if(name === "estoque"){ renderStock(); renderConfig(); }
-    if(name === "padroes") renderPatterns();
+    if(name === "historico") showSub(historicoSub);
     if(name === "rastreio") renderTracking();
     if(name === "config"){ renderMeta(); renderTagList(); renderTrackingSettings(); }
   }
@@ -1536,7 +1652,7 @@
       clearAmounts(true);
       toast("Registrado");
     }
-    renderRecent();
+    refreshList();
     renderPatterns();
   });
 
@@ -1551,71 +1667,283 @@
     return d.innerHTML;
   }
 
-  function renderRecent(){
-    var list = loadRecords().slice().sort(function(a,b){
+  /* ================= HISTÓRICO: lista completa =================
+     Nada de corte: a lista mostra todos os registros, paginando de 30 em 30.
+     Os três filtros se combinam com E. */
+  var listFilters = { month:"", day:"", tag:"" };
+  var LIST_PAGE = 30;
+  var listShown = LIST_PAGE;
+  var WD_MIN = ["dom","seg","ter","qua","qui","sex","sáb"];
+
+  function allRecordsSorted(){
+    return loadRecords().slice().sort(function(a,b){
       var da = a.date + (a.time || "00:00");
       var db = b.date + (b.time || "00:00");
       return db < da ? -1 : (db > da ? 1 : 0);
     });
-    var wrap = document.getElementById("recent-list");
-    if(list.length === 0){
-      wrap.innerHTML = '<div class="empty">Nada registrado ainda.</div>';
-      return;
-    }
-    wrap.innerHTML = "";
-    list.slice(0,12).forEach(function(r){
-      var row = document.createElement("div");
-      row.className = "record";
+  }
 
-      var when = document.createElement("div");
-      when.className = "when";
-      when.innerHTML =
-        '<span class="date">' + fmtShort(r.date) + (r.time ? " · " + r.time : "") + '</span>' +
-        (r.ctx ? '<span class="ctx">' + escapeHTML(r.ctx) + '</span>' : "") +
-        (Array.isArray(r.tags) && r.tags.length
-          ? '<div class="rtags">' + r.tags.map(function(t){
-              return '<span>' + escapeHTML(t) + '</span>';
-            }).join("") + '</div>'
-          : "");
+  function recordTags(r){ return Array.isArray(r.tags) ? r.tags : []; }
 
-      var actions = document.createElement("div");
-      actions.className = "actions";
-
-      var editBtn = document.createElement("button");
-      editBtn.type = "button";
-      editBtn.textContent = "Editar";
-      editBtn.addEventListener("click", function(){ startEdit(r); });
-
-      var moreBtn = document.createElement("button");
-      moreBtn.type = "button";
-      moreBtn.className = "more";
-      moreBtn.textContent = "•••";
-      moreBtn.setAttribute("aria-label", "Mais ações para este registro");
-      moreBtn.addEventListener("click", function(){ row.classList.toggle("open"); });
-
-      var delBtn = document.createElement("button");
-      delBtn.type = "button";
-      delBtn.className = "del";
-      delBtn.textContent = "Excluir registro";
-      delBtn.addEventListener("click", function(){ deleteRecord(r.id); });
-
-      actions.appendChild(editBtn);
-      actions.appendChild(moreBtn);
-      actions.appendChild(delBtn);
-      when.appendChild(actions);
-
-      var amounts = document.createElement("div");
-      amounts.className = "amounts";
-      var parts = [];
-      if(r.d8) parts.push(fmtNum(r.d8) + '<span class="tag">D8</span>');
-      if(r.d9) parts.push(fmtNum(r.d9) + '<span class="tag">D9</span>');
-      amounts.innerHTML = parts.join("<br>");
-
-      row.appendChild(when);
-      row.appendChild(amounts);
-      wrap.appendChild(row);
+  function recordsFiltered(){
+    return allRecordsSorted().filter(function(r){
+      if(listFilters.month && r.date.slice(0,7) !== listFilters.month) return false;
+      if(listFilters.day   && r.date !== listFilters.day) return false;
+      if(listFilters.tag   && recordTags(r).indexOf(listFilters.tag) === -1) return false;
+      return true;
     });
   }
+
+  function filtersActive(){
+    return !!(listFilters.month || listFilters.day || listFilters.tag);
+  }
+
+  /* uma linha de registro — mesma apresentação de antes, agora reaproveitável */
+  function buildRecordRow(r){
+    var row = document.createElement("div");
+    row.className = "record";
+
+    var when = document.createElement("div");
+    when.className = "when";
+    when.innerHTML =
+      '<span class="date">' + fmtShort(r.date) + (r.time ? " · " + r.time : "") + '</span>' +
+      (r.ctx ? '<span class="ctx">' + escapeHTML(r.ctx) + '</span>' : "") +
+      (recordTags(r).length
+        ? '<div class="rtags">' + recordTags(r).map(function(t){
+            return '<span>' + escapeHTML(t) + '</span>';
+          }).join("") + '</div>'
+        : "");
+
+    var actions = document.createElement("div");
+    actions.className = "actions";
+
+    var editBtn = document.createElement("button");
+    editBtn.type = "button";
+    editBtn.textContent = "Editar";
+    editBtn.addEventListener("click", function(){ startEdit(r); });
+
+    var moreBtn = document.createElement("button");
+    moreBtn.type = "button";
+    moreBtn.className = "more";
+    moreBtn.textContent = "•••";
+    moreBtn.setAttribute("aria-label", "Mais ações para este registro");
+    moreBtn.addEventListener("click", function(){ row.classList.toggle("open"); });
+
+    var delBtn = document.createElement("button");
+    delBtn.type = "button";
+    delBtn.className = "del";
+    delBtn.textContent = "Excluir registro";
+    delBtn.addEventListener("click", function(){ deleteRecord(r.id); });
+
+    actions.appendChild(editBtn);
+    actions.appendChild(moreBtn);
+    actions.appendChild(delBtn);
+    when.appendChild(actions);
+
+    var amounts = document.createElement("div");
+    amounts.className = "amounts";
+    var parts = [];
+    if(r.d8) parts.push(fmtNum(r.d8) + '<span class="tag">D8</span>');
+    if(r.d9) parts.push(fmtNum(r.d9) + '<span class="tag">D9</span>');
+    amounts.innerHTML = parts.join("<br>");
+
+    row.appendChild(when);
+    row.appendChild(amounts);
+    return row;
+  }
+
+  function populateMonthFilter(){
+    var sel = document.getElementById("flt-month");
+    var seen = {};
+    allRecordsSorted().forEach(function(r){ seen[r.date.slice(0,7)] = true; });
+    var months = Object.keys(seen).sort().reverse();
+    var atual = listFilters.month;
+    sel.innerHTML = "";
+    var opt0 = document.createElement("option");
+    opt0.value = ""; opt0.textContent = "Todos";
+    sel.appendChild(opt0);
+    months.forEach(function(m){
+      var o = document.createElement("option");
+      o.value = m;
+      o.textContent = MONTHS_SHORT[parseInt(m.slice(5,7),10)-1] + " " + m.slice(0,4);
+      sel.appendChild(o);
+    });
+    sel.value = months.indexOf(atual) > -1 ? atual : "";
+    if(sel.value !== atual) listFilters.month = sel.value;
+  }
+
+  function renderFilterTags(){
+    var wrap = document.getElementById("flt-tags");
+    /* tags cadastradas + as que aparecem em registros antigos, para não sumir nada */
+    var seen = {};
+    loadTags().forEach(function(t){ seen[t] = true; });
+    allRecordsSorted().forEach(function(r){ recordTags(r).forEach(function(t){ seen[t] = true; }); });
+    var tags = Object.keys(seen).sort(function(a,b){ return a.localeCompare(b,"pt-BR"); });
+
+    wrap.innerHTML = "";
+    if(tags.length === 0){
+      var none = document.createElement("div");
+      none.className = "none";
+      none.textContent = "Sem tags.";
+      wrap.appendChild(none);
+      return;
+    }
+    if(listFilters.tag && tags.indexOf(listFilters.tag) === -1) listFilters.tag = "";
+
+    [""].concat(tags).forEach(function(t){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.textContent = t === "" ? "Todas" : t;
+      if(listFilters.tag === t) b.className = "on";
+      b.setAttribute("aria-pressed", listFilters.tag === t ? "true" : "false");
+      b.addEventListener("click", function(){
+        listFilters.tag = t;
+        listShown = LIST_PAGE;
+        renderFilterTags();
+        renderList();
+      });
+      wrap.appendChild(b);
+    });
+  }
+
+  function renderList(){
+    var body = document.getElementById("list-body");
+    var meta = document.getElementById("list-meta");
+    var more = document.getElementById("btn-list-more");
+    var clear = document.getElementById("btn-flt-clear");
+    if(!body) return;
+
+    clear.style.display = filtersActive() ? "block" : "none";
+
+    var total = loadRecords().length;
+    var recs = recordsFiltered();
+    body.innerHTML = "";
+
+    if(recs.length === 0){
+      meta.textContent = "";
+      more.style.display = "none";
+      var p = document.createElement("div");
+      p.className = "panel";
+      var ed = document.createElement("div");
+      ed.className = "editorial";
+      if(total === 0){
+        ed.textContent = "Nada registrado ainda.";
+      } else {
+        ed.textContent = "Nenhum registro com esses filtros.";
+        var sm = document.createElement("small");
+        var ativos = [];
+        if(listFilters.month){
+          ativos.push("mês de " + MONTHS[parseInt(listFilters.month.slice(5,7),10)-1]);
+        }
+        if(listFilters.day) ativos.push("dia " + fmtShort(listFilters.day));
+        if(listFilters.tag) ativos.push("tag " + listFilters.tag);
+        sm.textContent = "Filtros ativos: " + ativos.join(", ") + ".";
+        ed.appendChild(sm);
+      }
+      p.appendChild(ed);
+      body.appendChild(p);
+      return;
+    }
+
+    var page = recs.slice(0, listShown);
+    meta.textContent = recs.length <= page.length
+      ? (recs.length === 1 ? "1 registro" : recs.length + " registros")
+      : "Mostrando " + page.length + " de " + recs.length + " registros";
+
+    /* agrupa por dia, com cabeçalho e o total do dia */
+    var grupos = [], atual = null;
+    page.forEach(function(r){
+      if(!atual || atual.date !== r.date){
+        atual = { date:r.date, itens:[], d8:0, d9:0 };
+        grupos.push(atual);
+      }
+      atual.itens.push(r);
+      atual.d8 += r.d8 || 0;
+      atual.d9 += r.d9 || 0;
+    });
+
+    grupos.forEach(function(g){
+      var bloco = document.createElement("div");
+      bloco.className = "daygroup";
+
+      var head = document.createElement("div");
+      head.className = "dayhead";
+      var wd = WD_MIN[new Date(g.date + "T00:00:00").getDay()];
+      var esq = document.createElement("span");
+      esq.textContent = fmtShort(g.date) + " · " + wd;
+      var dir = document.createElement("span");
+      dir.className = "dsum";
+      var soma = [];
+      if(g.d8) soma.push("D8 " + fmtNum(g.d8));
+      if(g.d9) soma.push("D9 " + fmtNum(g.d9));
+      dir.textContent = soma.join(" · ");
+      head.appendChild(esq);
+      head.appendChild(dir);
+      bloco.appendChild(head);
+
+      var painel = document.createElement("div");
+      painel.className = "panel";
+      g.itens.forEach(function(r){ painel.appendChild(buildRecordRow(r)); });
+      bloco.appendChild(painel);
+      body.appendChild(bloco);
+    });
+
+    more.style.display = recs.length > page.length ? "block" : "none";
+    more.textContent = "Mostrar mais " +
+      Math.min(LIST_PAGE, recs.length - page.length) + " registros";
+  }
+
+  /* refaz filtros e lista — usado quando os dados mudam */
+  function refreshList(){
+    populateMonthFilter();
+    renderFilterTags();
+    renderList();
+  }
+
+  document.getElementById("flt-month").addEventListener("change", function(){
+    listFilters.month = this.value;
+    listShown = LIST_PAGE;
+    renderList();
+  });
+  document.getElementById("flt-day").addEventListener("change", function(){
+    listFilters.day = this.value;
+    listShown = LIST_PAGE;
+    renderList();
+  });
+  document.getElementById("btn-flt-clear").addEventListener("click", function(){
+    listFilters = { month:"", day:"", tag:"" };
+    listShown = LIST_PAGE;
+    document.getElementById("flt-month").value = "";
+    document.getElementById("flt-day").value = "";
+    renderFilterTags();
+    renderList();
+  });
+  document.getElementById("btn-list-more").addEventListener("click", function(){
+    listShown += LIST_PAGE;
+    renderList();
+  });
+
+  /* ---------- sub-páginas do Histórico ---------- */
+  var historicoSub = "lista";
+  function showSub(name){
+    historicoSub = name;
+    document.querySelectorAll(".subnav button").forEach(function(b){
+      b.setAttribute("aria-selected", b.dataset.sub === name ? "true" : "false");
+    });
+    document.getElementById("sub-lista").classList.toggle("active", name === "lista");
+    document.getElementById("sub-padroes").classList.toggle("active", name === "padroes");
+    mainEl.scrollTop = 0;
+    if(name === "lista") refreshList();
+    if(name === "padroes") renderPatterns();
+  }
+  document.querySelectorAll(".subnav button").forEach(function(b){
+    b.addEventListener("click", function(){ showSub(b.dataset.sub); });
+  });
+
+  document.getElementById("btn-go-historico").addEventListener("click", function(){
+    goTo("historico");
+    showSub("lista");
+  });
 
   function startEdit(r){
     editingId = r.id;
@@ -1633,7 +1961,7 @@
 
   function deleteRecord(id){
     saveRecords(loadRecords().filter(function(r){ return r.id !== id; }));
-    renderRecent();
+    refreshList();
     renderPatterns();
     toast("Registro excluído");
   }
@@ -1730,10 +2058,15 @@
     document.getElementById("avg-d9").textContent = fmtNum(avg.d9);
     document.getElementById("last-count").textContent = fmtShortYear(stock.since);
 
+    /* Dois níveis: 16–12 é um aviso tranquilo (tom sálvia);
+       abaixo de 12 é crítico (terracota). Acima de 16 não avisa. */
     var total = stock.d8 + stock.d9;
-    if(total <= 15){
-      alertBox.innerHTML = '<div class="alert-banner">Restam ' + fmtNum(total) +
-        ' no total. É o ponto de fazer o próximo pedido com folga de prazo.</div>';
+    if(total < 12){
+      alertBox.innerHTML = '<div class="alert-banner">O estoque está crítico (' + fmtNum(total) +
+        ' restantes). Melhor garantir a reposição o quanto antes para evitar surpresas.</div>';
+    } else if(total <= 16){
+      alertBox.innerHTML = '<div class="note">Opa! Chegamos a ' + fmtNum(total) +
+        ' unidades por aqui. Aquele momento perfeito para garantir a reposição e manter tudo sob controle!</div>';
     }
   }
 
@@ -2878,7 +3211,7 @@
         if(typeof data.trackingCode === "string" && data.trackingCode){
           if(data.trackingCode !== getTrackingCode()){ saveTrackingCode(data.trackingCode); clearTrackingCache(); }
         }
-        renderRecent(); renderStock(); renderConfig(); renderMeta();
+        refreshList(); renderStock(); renderConfig(); renderMeta();
         renderChips(); renderTagList(); renderPatterns();
         renderTracking(); renderTrackingSettings();
         toast("Backup importado");
@@ -2911,14 +3244,14 @@
     clearTrackingCache();
     resetArmed = false;
     btnReset.textContent = "Apagar todos os dados";
-    renderRecent(); renderStock(); renderConfig(); renderMeta();
+    refreshList(); renderStock(); renderConfig(); renderMeta();
     renderChips(); renderTagList(); renderPatterns();
     renderTracking(); renderTrackingSettings();
     toast("Dados apagados");
   });
 
   // ---------- início ----------
-  renderRecent();
+  refreshList();
   renderStock();
   renderConfig();
   renderMeta();
