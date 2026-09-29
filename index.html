@@ -925,6 +925,81 @@
   .courier{
     font-size:12px; letter-spacing:0.14em; color:var(--sage-600);
   }
+  /* linha da transportadora com o ••• à direita */
+  .courier-row{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:var(--s-3);
+    margin-right:-10px;
+  }
+  .courier-row .more{
+    background:none; border:none;
+    color:var(--sage-600);
+    font-size:15px; letter-spacing:.12em;
+    min-width:44px; min-height:44px;
+    border-radius:12px;
+    transition:background var(--t), color var(--t);
+  }
+  .courier-row .more:active{ background:var(--sage-200); color:var(--ivy-900); }
+  .courier-row .more[aria-expanded="true"]{ color:var(--ivy-900); }
+  .courier-row .more:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(120,145,129,.35); }
+
+  /* ação revelada pelo ••• — mesmo padrão da lista de registros */
+  .courier-action{ display:none; margin-top:var(--s-2); }
+  .courier-action.open{ display:block; }
+  .courier-action button{
+    width:100%; min-height:48px;
+    border:1px solid var(--sage-200); border-radius:var(--radius-md);
+    background:transparent; color:var(--ivy-900);
+    font-family:var(--sans); font-size:15.5px;
+    transition:background var(--t);
+  }
+  .courier-action button:active{ background:var(--sage-200); }
+
+  /* painel de confirmação */
+  .confirm-panel{ margin-top:var(--s-3); }
+  .confirm-panel .codeline{
+    font-size:13px; letter-spacing:.1em; color:var(--sage-700);
+    padding-bottom:var(--s-4);
+    border-bottom:1px solid var(--sage-200);
+    margin-bottom:var(--s-4);
+  }
+
+  /* entregas anteriores */
+  .delivery{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    gap:var(--s-4);
+    padding:var(--s-4) 0;
+    border-bottom:1px solid var(--sage-200);
+  }
+  .delivery:first-child{ padding-top:var(--s-1); }
+  .delivery:last-child{ border-bottom:none; padding-bottom:var(--s-1); }
+  .delivery .code{
+    font-size:13px; letter-spacing:.09em; color:var(--sage-700);
+  }
+  .delivery .span{
+    font-size:15.5px; color:var(--ivy-950);
+    margin-top:var(--s-1); line-height:1.4;
+  }
+  .delivery .transit{
+    font-family:var(--serif); font-size:17px;
+    color:var(--ivy-900); white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+  }
+  .delivery .transit small{
+    display:block; font-family:var(--sans); font-size:12.5px;
+    color:var(--sage-700); text-align:right;
+  }
+  .delivery .acts{ display:flex; gap:var(--s-1); margin-top:var(--s-2); margin-left:-10px; }
+  .delivery .acts button{
+    background:none; border:none;
+    font-family:var(--sans); font-size:13.5px; color:var(--sage-700);
+    padding:8px 10px; min-height:38px; border-radius:10px;
+    transition:background var(--t);
+  }
+  .delivery .acts button:active{ background:var(--sage-200); }
+  .delivery .acts .rm{ color:var(--danger); display:none; }
+  .delivery.open .acts .rm{ display:inline-block; }
+
   .status-card{ margin-top:var(--s-3); }
   .status-card .lbl{
     font-size:13px; color:var(--sage-700); margin-bottom:var(--s-2);
@@ -3011,18 +3086,206 @@
   }
 
   // ---------- render principal ----------
+
+  /* ---------- entregas anteriores ----------
+     Diferente do cache de rastreio, isto NÃO é recuperável: a transportadora
+     derruba código antigo. Por isso entra no backup. */
+  var DELIVERIES_KEY = "dlcnh_deliveries_v1";
+  var menuOpen = false;      /* ••• revelou a opção */
+  var confirmOpen = false;   /* painel de datas aberto */
+
+  function loadDeliveries(){
+    try{
+      var d = JSON.parse(localStorage.getItem(DELIVERIES_KEY));
+      return Array.isArray(d) ? d : [];
+    }catch(e){ return []; }
+  }
+  function saveDeliveries(list){
+    try{ localStorage.setItem(DELIVERIES_KEY, JSON.stringify(list)); }catch(e){}
+  }
+  function clearDeliveries(){
+    try{ localStorage.removeItem(DELIVERIES_KEY); }catch(e){}
+  }
+
+  /* data do evento mais antigo — só um palpite para pré-preencher:
+     nos dados reais da Memphis o evento de criação do pedido nem sempre é o
+     mais antigo, então o campo fica editável. */
+  function guessOrderDate(){
+    var cache = getTrackingCache();
+    if(!cache || !Array.isArray(cache.events) || !cache.events.length) return "";
+    var comData = cache.events.filter(function(e){ return e.stamp; });
+    if(!comData.length) return "";
+    return comData[comData.length - 1].stamp.date;
+  }
+
+  function buildCourierRow(){
+    var row = tEl("div","courier-row");
+    row.appendChild(tEl("div","courier","MEMPHIS COURIER"));
+    var more = tEl("button","more","•••");
+    more.type = "button";
+    more.setAttribute("aria-label","Mais ações para esta encomenda");
+    more.setAttribute("aria-expanded", menuOpen ? "true" : "false");
+    more.addEventListener("click", function(){
+      menuOpen = !menuOpen;
+      if(!menuOpen) confirmOpen = false;
+      renderTracking();
+    });
+    row.appendChild(more);
+    return row;
+  }
+
+  /* opção revelada pelo ••• — mesmo padrão do ••• na lista de registros */
+  function buildCourierAction(){
+    var wrap = tEl("div","courier-action open");
+    var b = tEl("button", null, "Confirmar entrega");
+    b.type = "button";
+    b.addEventListener("click", function(){
+      confirmOpen = true;
+      renderTracking();
+    });
+    wrap.appendChild(b);
+    return wrap;
+  }
+
+  function buildConfirmPanel(){
+    var wrap = tEl("div","panel confirm-panel");
+    wrap.appendChild(tEl("div","codeline", getTrackingCode()));
+
+    function campo(id, rotulo, valor){
+      var lab = document.createElement("label");
+      lab.className = "field";
+      lab.appendChild(tEl("span","label-text", rotulo));
+      var inp = document.createElement("input");
+      inp.type = "date"; inp.id = id; inp.value = valor || "";
+      lab.appendChild(inp);
+      return lab;
+    }
+    wrap.appendChild(campo("dlv-ordered","Data do pedido", guessOrderDate()));
+    wrap.appendChild(campo("dlv-delivered","Data da entrega", todayISO()));
+
+    var ok = tEl("button","primary","Arquivar entrega");
+    ok.type = "button";
+    ok.addEventListener("click", confirmDelivery);
+    wrap.appendChild(ok);
+
+    var cancel = tEl("button","quiet","Cancelar");
+    cancel.type = "button";
+    cancel.addEventListener("click", function(){
+      confirmOpen = false; menuOpen = false;
+      renderTracking();
+    });
+    wrap.appendChild(cancel);
+    return wrap;
+  }
+
+  function confirmDelivery(){
+    var code = getTrackingCode();
+    if(!code) return;
+    var ordered  = document.getElementById("dlv-ordered").value;
+    var delivered = document.getElementById("dlv-delivered").value;
+
+    if(!delivered){ toast("Informe a data da entrega"); return; }
+    if(ordered && ordered > delivered){
+      toast("A entrega não pode ser antes do pedido");
+      return;
+    }
+
+    var list = loadDeliveries();
+    list.push({
+      id: uid(), code: code,
+      ordered: ordered || "", delivered: delivered,
+      confirmedAt: new Date().toISOString()
+    });
+    saveDeliveries(list);
+
+    /* encerra o rastreio atual: o app fica pronto para o próximo código.
+       O histórico de entregas NÃO é tocado por isso. */
+    clearTrackingCode();
+    clearTrackingCache();
+    confirmOpen = false; menuOpen = false;
+    renderTracking();
+    renderTrackingSettings();
+    announce("Entrega confirmada e arquivada.");
+    toast("Entrega confirmada");
+  }
+
+  function removeDelivery(id){
+    saveDeliveries(loadDeliveries().filter(function(d){ return d.id !== id; }));
+    renderTracking();
+    toast("Entrega removida do histórico");
+  }
+
+  function buildDeliveries(){
+    var list = loadDeliveries().slice().sort(function(a,b){
+      return a.delivered < b.delivered ? 1 : (a.delivered > b.delivered ? -1 : 0);
+    });
+    if(list.length === 0) return null;
+
+    var frag = document.createDocumentFragment();
+    frag.appendChild(trackTitle("Entregas anteriores"));
+
+    var panel = tEl("div","panel");
+    list.forEach(function(d){
+      var row = tEl("div","delivery");
+
+      var esq = tEl("div");
+      esq.appendChild(tEl("div","code", d.code));
+      var periodo = d.ordered
+        ? "Pedido " + fmtShort(d.ordered) + " · entregue " + fmtShort(d.delivered)
+        : "Entregue " + fmtShort(d.delivered);
+      esq.appendChild(tEl("div","span", periodo));
+
+      var acts = tEl("div","acts");
+      var more = tEl("button","more","•••");
+      more.type = "button";
+      more.setAttribute("aria-label","Mais ações para esta entrega");
+      more.addEventListener("click", function(){ row.classList.toggle("open"); });
+      var rm = tEl("button","rm","Remover do histórico");
+      rm.type = "button";
+      rm.addEventListener("click", function(){ removeDelivery(d.id); });
+      acts.appendChild(more);
+      acts.appendChild(rm);
+      esq.appendChild(acts);
+
+      var dir = tEl("div","transit");
+      if(d.ordered){
+        var dias = daysBetween(d.ordered, d.delivered);
+        dir.textContent = dias;
+        dir.appendChild(tEl("small", null, dias === 1 ? "dia" : "dias"));
+      }
+
+      row.appendChild(esq);
+      row.appendChild(dir);
+      panel.appendChild(row);
+    });
+    frag.appendChild(panel);
+    return frag;
+  }
+
   function renderTracking(){
     var body = document.getElementById("track-body");
     if(!body) return;
     body.innerHTML = "";
 
-    var code = getTrackingCode();
-    if(!code){ body.appendChild(buildNoCode()); return; }
+    var hist = buildDeliveries();
 
-    body.appendChild(tEl("div","courier","MEMPHIS COURIER"));
+    var code = getTrackingCode();
+    if(!code){
+      body.appendChild(buildNoCode());
+      if(hist) body.appendChild(hist);      /* histórico segue visível sem código */
+      return;
+    }
+
+    body.appendChild(buildCourierRow());
+    if(menuOpen && !confirmOpen) body.appendChild(buildCourierAction());
+    if(confirmOpen) body.appendChild(buildConfirmPanel());
 
     var cache = getTrackingCache();
-    if(!cache){ body.appendChild(buildReady()); return; }
+    if(!cache){
+      body.appendChild(buildReady());
+      if(hist) body.appendChild(hist);
+      return;
+    }
 
     var events = Array.isArray(cache.events) ? cache.events : [];
     body.appendChild(buildStatusCard(events));
@@ -3038,6 +3301,8 @@
       body.appendChild(trackTitle("Histórico"));
       body.appendChild(buildTimeline(events));
     }
+
+    if(hist) body.appendChild(hist);
   }
 
   function setRefreshBusy(busy){
@@ -3119,6 +3384,7 @@
     /* Trocou o código: o histórico da encomenda anterior não pode continuar
        aparecendo como se fosse da nova. Limpa só o rastreamento. */
     if(previous && previous !== val) clearTrackingCache();
+    confirmOpen = false; menuOpen = false;
     trackCodeInput.value = val;
     renderTrackingSettings();
     renderTracking();
@@ -3190,7 +3456,8 @@
 
   document.getElementById("btn-export-json").addEventListener("click", function(){
     var data = { records:loadRecords(), stockEvents:loadStockEvents(), tags:loadTags(),
-                 trackingCode:getTrackingCode(), exportedAt:new Date().toISOString() };
+                 trackingCode:getTrackingCode(), deliveries:loadDeliveries(),
+                 exportedAt:new Date().toISOString() };
     shareOrDownload(JSON.stringify(data, null, 2), "dlcnh_backup_" + todayISO() + ".json", "application/json");
   });
 
@@ -3208,6 +3475,7 @@
         if(Array.isArray(data.records)) saveRecords(data.records);
         if(Array.isArray(data.stockEvents)) saveStockEvents(data.stockEvents);
         if(Array.isArray(data.tags)) saveTags(data.tags);
+        if(Array.isArray(data.deliveries)) saveDeliveries(data.deliveries);
         if(typeof data.trackingCode === "string" && data.trackingCode){
           if(data.trackingCode !== getTrackingCode()){ saveTrackingCode(data.trackingCode); clearTrackingCache(); }
         }
@@ -3242,6 +3510,7 @@
     localStorage.removeItem(TAGS_KEY);
     clearTrackingCode();
     clearTrackingCache();
+    clearDeliveries();
     resetArmed = false;
     btnReset.textContent = "Apagar todos os dados";
     refreshList(); renderStock(); renderConfig(); renderMeta();
