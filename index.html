@@ -838,6 +838,111 @@
      .field:last-of-type zerava a margem da div e colava os dois. */
   .field.tags-field{ margin-bottom:var(--s-5); }
 
+  /* ================= PROTOCOLO ================= */
+  /* Escalada por peso visual, não por semáforo: sálvia -> verde-hera -> terracota.
+     Todos são tokens que já existem na identidade. */
+  /* .field:last-of-type zera a margem só do segundo campo do row2, o que
+     desalinhava a dupla; aqui a margem vem do próprio grid */
+  #view-config .row2{ align-items:end; }
+  #view-config .row2 > .field{ margin-bottom:0; }
+  #view-config .row2 + .row2{ margin-top:var(--s-5); }
+  #view-config .row2 + .field{ margin-top:var(--s-5); }
+
+  .weekbox{ margin-bottom:var(--s-3); }
+  .weekbox .wk-head{
+    display:flex; align-items:baseline; justify-content:space-between;
+    gap:var(--s-3);
+  }
+  .weekbox .wk-title{
+    font-size:13px; letter-spacing:.09em; color:var(--sage-700);
+  }
+  .weekbox .wk-used{
+    font-family:var(--serif); font-size:40px; line-height:1;
+    letter-spacing:-.02em; font-variant-numeric:tabular-nums;
+  }
+  .weekbox .wk-of{
+    font-family:var(--sans); font-size:14px; color:var(--sage-700);
+    margin-left:4px; letter-spacing:0;
+  }
+  .wk-bar{
+    height:6px; background:var(--field);
+    border-radius:999px; overflow:hidden;
+    margin-top:var(--s-4);
+  }
+  .wk-bar i{
+    display:block; height:100%; border-radius:999px;
+    background:var(--sage-500);
+    transition:width .4s var(--ease), background-color .3s var(--ease);
+  }
+  .wk-bar i.near{ background:var(--ivy-900); }
+  .wk-bar i.over{ background:var(--danger); }
+  .weekbox .wk-foot{
+    display:flex; justify-content:space-between; gap:var(--s-3);
+    margin-top:var(--s-3);
+    font-size:14px; color:var(--sage-700);
+    font-variant-numeric:tabular-nums;
+  }
+  .weekbox .wk-foot .left.over{ color:var(--danger); }
+  .weekbox .wk-note{
+    font-size:14px; color:var(--sage-700); line-height:1.45;
+    margin-top:var(--s-3);
+  }
+
+  /* projeção */
+  /* separador por borda-superior: com border-bottom no .ln a linha
+     dobrava quando o bloco de comparação vinha logo depois */
+  .proj .ln{
+    display:flex; justify-content:space-between; align-items:baseline;
+    gap:var(--s-4); padding:var(--s-3) 0;
+    font-size:15px;
+  }
+  .proj .ln + .ln{ border-top:1px solid var(--sage-200); }
+  .proj .ln .k{ color:var(--sage-700); }
+  .proj .ln .v{
+    text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap;
+  }
+  .proj .ln .v small{
+    display:block; font-size:12.5px; color:var(--sage-700);
+  }
+  .proj .ln .v.urgent{ color:var(--danger); }
+  .proj .compare{
+    margin-top:var(--s-4); padding-top:var(--s-4);
+    border-top:1px solid var(--sage-200);
+    font-size:14px; color:var(--sage-700); line-height:1.5;
+  }
+
+  /* placar semanal */
+  .placar-grid{
+    display:flex; flex-wrap:wrap; gap:var(--s-3) var(--s-2);
+    margin-top:var(--s-5);
+    padding-top:var(--s-5);
+    border-top:1px solid var(--sage-200);
+  }
+  .placar-grid .wk{
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    min-width:34px;
+  }
+  .placar-grid .dot{
+    width:14px; height:14px; border-radius:5px;
+    background:var(--sage-300);
+  }
+  .placar-grid .dot.ok{ background:var(--ivy-900); }
+  .placar-grid .dot.over{ background:var(--danger); }
+  .placar-grid .lbl{
+    font-size:10.5px; color:var(--sage-600); font-variant-numeric:tabular-nums;
+  }
+  .placar-grid .lbl.over{ color:var(--danger); }
+  .placar-legend{
+    display:flex; flex-wrap:wrap; gap:var(--s-4);
+    margin-top:var(--s-4); font-size:12.5px; color:var(--sage-700);
+  }
+  .placar-legend span{ display:flex; align-items:center; gap:6px; }
+  .placar-legend i{
+    width:10px; height:10px; border-radius:4px; background:var(--sage-300);
+  }
+  .placar-legend i.ok{ background:var(--ivy-900); }
+  .placar-legend i.over{ background:var(--danger); }
+
   /* ================= HISTÓRICO ================= */
   /* Seletor de sub-página: estilo aba sublinhada, deliberadamente diferente
      das pílulas de filtro do Padrões — é navegação, não filtro. */
@@ -1310,6 +1415,8 @@
   <!-- ESTOQUE -->
   <section class="view" id="view-estoque">
 
+    <div id="weekbox"></div>
+
     <div class="stock-pair">
       <div class="stock-row">
         <div class="stock-head">
@@ -1356,6 +1463,9 @@
         <span class="v" id="last-count">—</span>
       </div>
     </div>
+
+    <h2 class="section-title">Projeção</h2>
+    <div class="panel" id="projbox"></div>
 
     <h2 class="section-title">Recontagem</h2>
     <div class="panel">
@@ -1458,6 +1568,33 @@
 
   <!-- AJUSTES -->
   <section class="view" id="view-config">
+    <h2 class="section-title">Protocolo</h2>
+    <div class="panel">
+      <p class="hint">O teto vale por semana (segunda a domingo). Mudar o valor aqui não reescreve semanas já fechadas.</p>
+      <div class="row2">
+        <label class="field">
+          <span class="label-text">Teto semanal</span>
+          <input type="number" id="cfg-ceiling" inputmode="decimal" step="0.5" min="0.5">
+        </label>
+        <label class="field">
+          <span class="label-text">Dias de uso</span>
+          <input type="number" id="cfg-maxdays" inputmode="numeric" step="1" min="1" max="7">
+        </label>
+      </div>
+      <div class="row2">
+        <label class="field">
+          <span class="label-text">Início</span>
+          <input type="date" id="cfg-start">
+        </label>
+        <label class="field">
+          <span class="label-text">Recompra</span>
+          <input type="number" id="cfg-threshold" inputmode="decimal" step="0.5" min="0.5">
+        </label>
+      </div>
+      <div class="preview" id="cfg-proto-preview"></div>
+      <button class="primary" id="btn-proto-save">Salvar protocolo</button>
+    </div>
+
     <h2 class="section-title">Dados</h2>
     <p class="hint tight">Seus dados ficam guardados neste aparelho. Faça backups periódicos para manter uma cópia segura.</p>
     <div class="list">
@@ -2041,6 +2178,138 @@
     toast("Registro excluído");
   }
 
+  /* ================= PROTOCOLO DE REDUÇÃO =================
+     Semana = segunda 00:00 a domingo 23:59, horário local. Vira sozinha.
+     O teto é histórico: mudar o valor no futuro não reescreve semanas passadas. */
+  var PROTOCOL_KEY = "dlcnh_protocol_v1";
+  var PROTOCOL_DEFAULTS = {
+    startDate: "2026-10-19",
+    ceilingHistory: [{ from: "2026-10-19", value: 5.5 }],
+    repurchaseThreshold: 16,
+    maxUseDays: 4
+  };
+
+  function normalizeProtocol(p){
+    p = (p && typeof p === "object") ? p : {};
+    var d = PROTOCOL_DEFAULTS;
+    var ch = Array.isArray(p.ceilingHistory)
+      ? p.ceilingHistory.filter(function(c){
+          return c && typeof c.from === "string" && /^\d{4}-\d{2}-\d{2}$/.test(c.from) && isFinite(c.value);
+        }).map(function(c){ return { from:c.from, value:+c.value }; })
+      : [];
+    ch.sort(function(a,b){ return a.from < b.from ? -1 : (a.from > b.from ? 1 : 0); });
+    return {
+      startDate: (typeof p.startDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(p.startDate))
+                 ? p.startDate : d.startDate,
+      ceilingHistory: ch.length ? ch : d.ceilingHistory.slice(),
+      repurchaseThreshold: isFinite(p.repurchaseThreshold) && +p.repurchaseThreshold > 0
+                 ? +p.repurchaseThreshold : d.repurchaseThreshold,
+      maxUseDays: isFinite(p.maxUseDays) && +p.maxUseDays > 0 ? +p.maxUseDays : d.maxUseDays
+    };
+  }
+  function loadProtocol(){
+    try{ return normalizeProtocol(JSON.parse(localStorage.getItem(PROTOCOL_KEY))); }
+    catch(e){ return normalizeProtocol(null); }
+  }
+  function saveProtocol(p){
+    try{ localStorage.setItem(PROTOCOL_KEY, JSON.stringify(normalizeProtocol(p))); }catch(e){}
+  }
+  function clearProtocol(){
+    try{ localStorage.removeItem(PROTOCOL_KEY); }catch(e){}
+  }
+
+  // ---------- semanas ----------
+  function mondayOf(iso){ return addDaysISO(iso, -weekdayOf(iso)); }
+
+  /* Totais de uma semana a partir da sua segunda. Sempre D8+D9: é assim
+     que o teto é medido, independente do filtro da aba Padrões. */
+  function weekTotals(records, mondayISO){
+    var end = addDaysISO(mondayISO, 6);
+    var d8 = 0, d9 = 0, dias = {};
+    records.forEach(function(r){
+      if(r.date >= mondayISO && r.date <= end){
+        d8 += r.d8 || 0; d9 += r.d9 || 0;
+        if((r.d8 || 0) + (r.d9 || 0) > 0) dias[r.date] = true;
+      }
+    });
+    return {
+      start: mondayISO, end: end,
+      d8: Math.round(d8*100)/100, d9: Math.round(d9*100)/100,
+      total: Math.round((d8+d9)*100)/100,
+      days: Object.keys(dias).length
+    };
+  }
+
+  /* Teto vigente na semana: a entrada mais recente com from <= segunda.
+     null = semana anterior ao início do protocolo. */
+  function ceilingFor(mondayISO){
+    var p = loadProtocol();
+    if(mondayISO < mondayOf(p.startDate)) return null;
+    var best = null;
+    p.ceilingHistory.forEach(function(c){
+      if(c.from <= mondayISO && (!best || c.from > best.from)) best = c;
+    });
+    return best ? best.value : null;
+  }
+
+  /* Faixa de cor. Nesta ordem não sobra vão, mesmo com teto quebrado. */
+  function ceilingBand(usado, teto){
+    if(!teto) return "pre";
+    if(usado > teto) return "over";
+    if(usado <= teto - 1.5) return "calm";
+    return "near";
+  }
+
+  /* Semanas fechadas, da mais recente para trás, sem descer abaixo da
+     primeira semana com registro (senão a média afundaria com zeros). */
+  function closedWeeks(records, n){
+    if(!records.length) return [];
+    var earliest = records[0].date;
+    records.forEach(function(r){ if(r.date < earliest) earliest = r.date; });
+    var firstMon = mondayOf(earliest);
+    var curMon = mondayOf(todayISO());
+    var out = [];
+    for(var i=1; i<=n; i++){
+      var ws = addDaysISO(curMon, -7*i);
+      if(ws < firstMon) break;
+      out.push(weekTotals(records, ws));
+    }
+    return out;
+  }
+
+  /* Todas as semanas fechadas desde a primeira com registro (ou desde o
+     início do protocolo), da mais antiga para a mais recente. */
+  function allClosedWeeks(records){
+    var p = loadProtocol();
+    var curMon = mondayOf(todayISO());
+    var firstMon = mondayOf(p.startDate);
+    if(records.length){
+      var earliest = records[0].date;
+      records.forEach(function(r){ if(r.date < earliest) earliest = r.date; });
+      var recMon = mondayOf(earliest);
+      if(recMon < firstMon) firstMon = recMon;
+    }
+    var out = [], ws = firstMon;
+    while(ws < curMon){
+      var w = weekTotals(records, ws);
+      w.ceiling = ceilingFor(ws);
+      w.over = w.ceiling !== null && w.total > w.ceiling;
+      out.push(w);
+      ws = addDaysISO(ws, 7);
+    }
+    return out;
+  }
+
+  /* Projeção: gasta primeiro o que resta do teto nesta semana, depois
+     semanas cheias. A data cai no domingo da semana em que esgota — o
+     modelo raciocina em semanas, não em dias. */
+  function projectWeeks(quantidade, restanteSemana, teto, curMon){
+    if(quantidade <= 0) return { weeks:0, date: todayISO(), agora:true };
+    if(quantidade <= restanteSemana) return { weeks:0, date: addDaysISO(curMon, 6) };
+    var semanas = Math.ceil((quantidade - restanteSemana) / teto);
+    return { weeks: semanas, date: addDaysISO(curMon, 6 + 7*semanas) };
+  }
+
   // ---------- estoque ----------
   function latestStockEvent(){
     var events = loadStockEvents();
@@ -2064,38 +2333,35 @@
     };
   }
 
+  /* Uma definição só de "média por semana" no app: as últimas 4 semanas
+     FECHADAS (segunda a domingo). A janela móvel de 28 dias misturava
+     consumo pré e pós-protocolo. Instalação nova, sem semana fechada
+     ainda, cai na reserva para a tela não ficar vazia. */
   function weeklyAverage(){
     var list = loadRecords();
+    var wks = closedWeeks(list, 4);
+    if(wks.length){
+      var s8 = 0, s9 = 0;
+      wks.forEach(function(w){ s8 += w.d8; s9 += w.d9; });
+      return { d8: s8/wks.length, d9: s9/wks.length, weeks: wks.length, basis: "closed" };
+    }
     var evt = latestStockEvent();
     var today = todayISO();
-    var cutoffISO = new Date(new Date(today) - 28*86400000).toISOString().slice(0,10);
-
     var earliest = null;
     list.forEach(function(r){ if(!earliest || r.date < earliest) earliest = r.date; });
-
-    var start = cutoffISO;
-    if(evt && evt.date > cutoffISO) start = evt.date;
-    else if(!evt && earliest && earliest > cutoffISO) start = earliest;
-
-    var sumD8 = 0, sumD9 = 0;
+    var start = earliest || today;
+    if(evt && evt.date > start) start = evt.date;
+    var a8 = 0, a9 = 0;
     list.forEach(function(r){
-      if(r.date >= start && r.date <= today){ sumD8 += r.d8 || 0; sumD9 += r.d9 || 0; }
+      if(r.date >= start && r.date <= today){ a8 += r.d8 || 0; a9 += r.d9 || 0; }
     });
-    var weeks = Math.max(1, daysBetween(start, today) + 1) / 7;
-    return { d8: sumD8/weeks, d9: sumD9/weeks };
-  }
-
-  /* Mesmo cálculo de antes (estoque ÷ ritmo semanal), apresentado em dias e com data-alvo. */
-  function durationText(stock, rate){
-    if(rate <= 0) return "sem consumo registrado";
-    if(stock <= 0) return "estoque zerado";
-    var days = Math.round((stock / rate) * 7);
-    if(days < 1) return "menos de 1 dia";
-    if(days === 1) return "aprox. 1 dia";
-    return "aprox. " + days + " dias · até " + fmtShort(addDaysISO(todayISO(), days));
+    var semanas = Math.max(1, daysBetween(start, today) + 1) / 7;
+    return { d8: a8/semanas, d9: a9/semanas, weeks: 0, basis: "partial" };
   }
 
   function renderStock(){
+    renderWeekBox();
+    renderProjection();
     var stock = computeStock();
     var avg = weeklyAverage();
     var alertBox = document.getElementById("stock-alert");
@@ -2124,10 +2390,14 @@
     document.getElementById("gauge-d8").style.width = Math.max(0, Math.min(100, pct8)) + "%";
     document.getElementById("gauge-d9").style.width = Math.max(0, Math.min(100, pct9)) + "%";
 
-    document.getElementById("foot-d8-left").textContent = durationText(stock.d8, avg.d8);
-    document.getElementById("foot-d9-left").textContent = durationText(stock.d9, avg.d9);
-    document.getElementById("foot-d8-rate").textContent = avg.d8 > 0 ? fmtNum(avg.d8) + "/sem" : "";
-    document.getElementById("foot-d9-rate").textContent = avg.d9 > 0 ? fmtNum(avg.d9) + "/sem" : "";
+    /* As datas de "acaba em" ficam concentradas no bloco Projeção. Aqui
+       só o ritmo, para não existirem duas datas diferentes na mesma tela. */
+    document.getElementById("foot-d8-left").textContent =
+      avg.d8 > 0 ? fmtNum(avg.d8) + " por semana" : "sem consumo registrado";
+    document.getElementById("foot-d9-left").textContent =
+      avg.d9 > 0 ? fmtNum(avg.d9) + " por semana" : "sem consumo registrado";
+    document.getElementById("foot-d8-rate").textContent = "";
+    document.getElementById("foot-d9-rate").textContent = "";
 
     document.getElementById("avg-d8").textContent = fmtNum(avg.d8);
     document.getElementById("avg-d9").textContent = fmtNum(avg.d9);
@@ -2143,6 +2413,198 @@
       alertBox.innerHTML = '<div class="note">Opa! Chegamos a ' + fmtNum(total) +
         ' unidades por aqui. Aquele momento perfeito para garantir a reposição e manter tudo sob controle!</div>';
     }
+  }
+
+
+  // ---------- Item 1: saída semanal ----------
+  function renderWeekBox(){
+    var box = document.getElementById("weekbox");
+    if(!box) return;
+    var p = loadProtocol();
+    var curMon = mondayOf(todayISO());
+    var w = weekTotals(loadRecords(), curMon);
+    var teto = ceilingFor(curMon);
+    box.innerHTML = "";
+
+    var panel = tEl("div","panel weekbox");
+
+    var head = tEl("div","wk-head");
+    head.appendChild(tEl("div","wk-title","SAÍDA SEMANAL"));
+    panel.appendChild(head);
+
+    if(teto === null){
+      /* antes do início do protocolo não existe teto: mostro o uso da
+         semana e digo quando o teto passa a valer, sem inventar barra. */
+      var n0 = tEl("div","wk-used", fmtNum(w.total));
+      n0.appendChild(tEl("span","wk-of","nesta semana"));
+      panel.appendChild(n0);
+      panel.appendChild(tEl("div","wk-note",
+        "O teto passa a valer em " + fmtShort(p.startDate)));
+      box.appendChild(panel);
+      return;
+    }
+
+    var usado = w.total;
+    var restante = Math.round((teto - usado)*100)/100;
+    var faixa = ceilingBand(usado, teto);
+
+    var num = tEl("div","wk-used", fmtNum(usado));
+    num.appendChild(tEl("span","wk-of","de " + fmtNum(teto)));
+    head.appendChild(num);
+
+    var bar = tEl("div","wk-bar");
+    var fill = tEl("i");
+    if(faixa === "near") fill.className = "near";
+    if(faixa === "over") fill.className = "over";
+    fill.style.width = Math.min(100, teto > 0 ? (usado/teto)*100 : 0) + "%";
+    bar.appendChild(fill);
+    panel.appendChild(bar);
+
+    var foot = tEl("div","wk-foot");
+    var left = tEl("span","left" + (restante < 0 ? " over" : ""),
+      (restante < 0 ? "restante −" + fmtNum(Math.abs(restante)) : "restante " + fmtNum(restante)));
+    var right = tEl("span", null, "dias de uso " + w.days + " de " + p.maxUseDays);
+    foot.appendChild(left);
+    foot.appendChild(right);
+    panel.appendChild(foot);
+
+    box.appendChild(panel);
+  }
+
+  // ---------- Item 2: projeção ----------
+  function renderProjection(){
+    var box = document.getElementById("projbox");
+    if(!box) return;
+    box.innerHTML = "";
+    var wrap = tEl("div","proj");
+
+    var stock = computeStock();
+    if(!stock){
+      box.appendChild(tEl("div","editorial","Informe sua contagem em Recontagem para ver a projeção."));
+      return;
+    }
+
+    var p = loadProtocol();
+    var records = loadRecords();
+    var curMon = mondayOf(todayISO());
+    var usado = weekTotals(records, curMon).total;
+    var teto = ceilingFor(curMon);
+    var total = Math.round((stock.d8 + stock.d9)*100)/100;
+
+    function linha(k, v, sub, urgente){
+      var ln = tEl("div","ln");
+      ln.appendChild(tEl("span","k", k));
+      var val = tEl("span","v" + (urgente ? " urgent" : ""), v);
+      if(sub) val.appendChild(tEl("small", null, sub));
+      ln.appendChild(val);
+      return ln;
+    }
+
+    wrap.appendChild(linha("Estoque atual", fmtNum(total) + " un."));
+
+    if(teto === null){
+      wrap.appendChild(tEl("div","compare",
+        "As estimativas por teto começam em " + fmtShort(p.startDate)));
+    } else {
+      var restante = Math.max(0, teto - usado);
+
+      var fim = projectWeeks(total, restante, teto, curMon);
+      wrap.appendChild(linha("Estimativa para acabar",
+        fim.agora ? "acabou" : fmtShort(fim.date),
+        fim.agora ? null : (fim.weeks === 0 ? "nesta semana"
+                          : "≈" + fim.weeks + (fim.weeks === 1 ? " semana" : " semanas")),
+        !!fim.agora));
+
+      var excedente = Math.round((total - p.repurchaseThreshold)*100)/100;
+      if(excedente <= 0){
+        wrap.appendChild(linha("Estimativa de recompra", "recompra agora",
+          "abaixo de " + fmtNum(p.repurchaseThreshold), true));
+      } else {
+        var rc = projectWeeks(excedente, restante, teto, curMon);
+        wrap.appendChild(linha("Estimativa de recompra", fmtShort(rc.date),
+          "ao chegar em " + fmtNum(p.repurchaseThreshold)));
+      }
+    }
+
+    /* comparação com o ritmo real das últimas semanas fechadas */
+    var wks = closedWeeks(records, 4);
+    var cmp = tEl("div","compare");
+    if(!wks.length){
+      cmp.textContent = "Ainda não há semana fechada para comparar com o ritmo real.";
+    } else {
+      var soma = 0;
+      wks.forEach(function(w){ soma += w.total; });
+      var media = soma / wks.length;
+      if(media <= 0){
+        cmp.textContent = "Nas últimas " + wks.length + " semanas fechadas não houve consumo registrado.";
+      } else {
+        var dias = Math.round((total / media) * 7);
+        var txt = "No seu ritmo real das últimas " + wks.length +
+          (wks.length === 1 ? " semana fechada" : " semanas fechadas") +
+          " (média de " + fmtNum(media) + "/semana), acabaria em " +
+          fmtShort(addDaysISO(todayISO(), dias));
+        if(wks.length < 4) txt += " Menos de 4 semanas fechadas disponíveis.";
+        cmp.textContent = txt;
+      }
+    }
+    wrap.appendChild(cmp);
+    box.appendChild(wrap);
+  }
+
+  // ---------- Item 3: placar semanal ----------
+  function renderPlacar(){
+    var records = loadRecords();
+    var semanas = allClosedWeeks(records);
+    if(!semanas.length) return "";
+
+    var doProtocolo = semanas.filter(function(w){ return w.ceiling !== null; });
+    var dentro = 0, estouradas = 0, seqAtual = 0, melhor = 0;
+    doProtocolo.forEach(function(w){
+      if(w.over){ estouradas++; seqAtual = 0; }
+      else { dentro++; seqAtual++; if(seqAtual > melhor) melhor = seqAtual; }
+    });
+
+    var grade = semanas.slice(-12).map(function(w){
+      var cls = w.ceiling === null ? "" : (w.over ? " over" : " ok");
+      var lbl, lblCls = "";
+      if(w.ceiling === null){
+        lbl = fmtNum(w.total);
+      } else if(w.over){
+        lbl = "+" + fmtNum(Math.round((w.total - w.ceiling)*100)/100);
+        lblCls = " over";
+      } else {
+        lbl = fmtNum(w.total);
+      }
+      var titulo = fmtShort(w.start) + " a " + fmtShort(w.end) + ": " + fmtNum(w.total) +
+        (w.ceiling === null ? " (pré-protocolo)" : " de " + fmtNum(w.ceiling));
+      return '<div class="wk" role="img" aria-label="' + esc(titulo) + '">' +
+             '<span class="dot' + cls + '"></span>' +
+             '<span class="lbl' + lblCls + '">' + esc(lbl) + '</span></div>';
+    }).join("");
+
+    var corpo;
+    if(doProtocolo.length === 0){
+      corpo = '<div class="editorial">O protocolo ainda não tem semana fechada.' +
+              '<small>As semanas abaixo são anteriores ao início e não entram no placar.</small></div>';
+    } else {
+      corpo = '<div class="sum-grid">' +
+        '<div class="cell"><div class="v">' + dentro + '</div><div class="k">dentro do teto</div></div>' +
+        '<div class="cell"><div class="v">' + estouradas + '</div><div class="k">estouradas</div></div>' +
+        '<div class="cell"><div class="v">' + seqAtual + '</div><div class="k">sequência atual</div></div>' +
+        '<div class="cell"><div class="v">' + melhor + '</div><div class="k">melhor sequência</div></div>' +
+      '</div>';
+    }
+
+    return sectionTitle("Placar semanal") +
+      '<div class="panel">' + corpo +
+      '<div class="placar-grid">' + grade + '</div>' +
+      '<div class="placar-legend">' +
+        '<span><i class="ok"></i>dentro</span>' +
+        '<span><i class="over"></i>estourou</span>' +
+        '<span><i></i>pré-protocolo</span>' +
+      '</div>' +
+      '<div class="infonote"><b>ⓘ</b><span>Semanas de segunda a domingo, já encerradas. Sempre sobre o total D8+D9, que é como o teto é medido.</span></div>' +
+      '</div>';
   }
 
   document.getElementById("rc-date").value = todayISO();
@@ -2303,6 +2765,59 @@
   document.getElementById("btn-tag-add").addEventListener("click", addTag);
   tagInput.addEventListener("keydown", function(e){
     if(e.key === "Enter"){ e.preventDefault(); addTag(); }
+  });
+
+
+  // ---------- configurações do protocolo ----------
+  var cfgCeiling   = document.getElementById("cfg-ceiling");
+  var cfgMaxDays   = document.getElementById("cfg-maxdays");
+  var cfgStart     = document.getElementById("cfg-start");
+  var cfgThreshold = document.getElementById("cfg-threshold");
+  var cfgProtoPrev = document.getElementById("cfg-proto-preview");
+
+  function renderProtocolSettings(){
+    var p = loadProtocol();
+    var curMon = mondayOf(todayISO());
+    var vigente = ceilingFor(curMon);
+    cfgCeiling.value   = vigente !== null ? vigente : p.ceilingHistory[p.ceilingHistory.length-1].value;
+    cfgMaxDays.value   = p.maxUseDays;
+    cfgStart.value     = p.startDate;
+    cfgThreshold.value = p.repurchaseThreshold;
+    cfgProtoPrev.innerHTML = vigente === null
+      ? "O protocolo começa em <strong>" + esc(fmtShort(p.startDate)) + "</strong>"
+      : "Teto em vigor nesta semana: <strong>" + esc(fmtNum(vigente)) + "</strong>.";
+  }
+
+  document.getElementById("btn-proto-save").addEventListener("click", function(){
+    var teto  = parseFloat(cfgCeiling.value);
+    var dias  = parseInt(cfgMaxDays.value, 10);
+    var ini   = cfgStart.value;
+    var lim   = parseFloat(cfgThreshold.value);
+    if(!isFinite(teto) || teto <= 0){ toast("Teto inválido"); return; }
+    if(!isFinite(dias) || dias < 1 || dias > 7){ toast("Dias de uso entre 1 e 7"); return; }
+    if(!ini){ toast("Informe a data de início"); return; }
+    if(!isFinite(lim) || lim <= 0){ toast("Limiar inválido"); return; }
+
+    var p = loadProtocol();
+    p.startDate = ini;
+    p.maxUseDays = dias;
+    p.repurchaseThreshold = lim;
+
+    /* O novo teto vale a partir da segunda desta semana, nunca antes do
+       início do protocolo: semanas já fechadas mantêm o teto delas. */
+    var iniMon = mondayOf(ini);
+    var from = mondayOf(todayISO());
+    if(from < iniMon) from = iniMon;
+    var ch = p.ceilingHistory.filter(function(c){ return c.from !== from && c.from >= iniMon; });
+    ch.push({ from: from, value: teto });
+    if(!ch.some(function(c){ return c.from === iniMon; })) ch.push({ from: iniMon, value: teto });
+    p.ceilingHistory = ch;
+
+    saveProtocol(p);
+    renderProtocolSettings();
+    renderStock();
+    renderPatterns();
+    toast("Protocolo salvo");
   });
 
   // ---------- metadados da aba Ajustes ----------
@@ -2753,6 +3268,7 @@
     var summary = getSummaryStats(recs, range);
     var iv = getIntervalStats(recs);
     html += renderSummary(summary, iv);
+    html += renderPlacar();
 
     if(recs.length < 3){
       html += renderHeatmap(heat);
@@ -3457,6 +3973,7 @@
   document.getElementById("btn-export-json").addEventListener("click", function(){
     var data = { records:loadRecords(), stockEvents:loadStockEvents(), tags:loadTags(),
                  trackingCode:getTrackingCode(), deliveries:loadDeliveries(),
+                 protocol:loadProtocol(),
                  exportedAt:new Date().toISOString() };
     shareOrDownload(JSON.stringify(data, null, 2), "dlcnh_backup_" + todayISO() + ".json", "application/json");
   });
@@ -3476,12 +3993,14 @@
         if(Array.isArray(data.stockEvents)) saveStockEvents(data.stockEvents);
         if(Array.isArray(data.tags)) saveTags(data.tags);
         if(Array.isArray(data.deliveries)) saveDeliveries(data.deliveries);
+        /* backup antigo não tem "protocol": normalizeProtocol preenche os padrões */
+        if(data.protocol) saveProtocol(data.protocol);
         if(typeof data.trackingCode === "string" && data.trackingCode){
           if(data.trackingCode !== getTrackingCode()){ saveTrackingCode(data.trackingCode); clearTrackingCache(); }
         }
         refreshList(); renderStock(); renderConfig(); renderMeta();
         renderChips(); renderTagList(); renderPatterns();
-        renderTracking(); renderTrackingSettings();
+        renderTracking(); renderTrackingSettings(); renderProtocolSettings();
         toast("Backup importado");
       }catch(err){
         toast("Esse arquivo não é um backup válido");
@@ -3511,11 +4030,12 @@
     clearTrackingCode();
     clearTrackingCache();
     clearDeliveries();
+    clearProtocol();
     resetArmed = false;
     btnReset.textContent = "Apagar todos os dados";
     refreshList(); renderStock(); renderConfig(); renderMeta();
     renderChips(); renderTagList(); renderPatterns();
-    renderTracking(); renderTrackingSettings();
+    renderTracking(); renderTrackingSettings(); renderProtocolSettings();
     toast("Dados apagados");
   });
 
@@ -3529,6 +4049,7 @@
   renderPatterns();
   renderTrackingSettings();
   renderTracking();
+  renderProtocolSettings();
 })();
 </script>
 
